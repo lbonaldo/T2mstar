@@ -3,7 +3,7 @@ using QuadGK
 using Roots
 
 tol = 1e-5 # Difference tolerance. Shouldn't need to be changed
-size = 100000 # The number of elements in the training set to generate
+size = 1000000 # The number of elements in the training set to generate
 test_frac = 0.1 # The size of the test set relative to the size of the train set.
 
 #root_heur = Dict{Array{Float64, 1}, Array{Float64, 1}}()
@@ -32,7 +32,7 @@ function forwardProb(β::Float64, a::Float64, b::Float64, c::Float64, d::Float64
     gaussian(x) = α*exp(-β*(x - μ)^2)
     # Defines the functions used by Roots.jl to find the intersection points
     l_min(x) = l(x, a, b) - gaussian(x)
-    r_min(x) =  - gaussian(x)
+    r_min(x) = r(x, c, d) - gaussian(x)
     # If the bands cross and β is sufficiently small, we only end up integrating over the gaussian, which is normalized. So we get 1. 
     # gaussian((d-b)/(a+c)) is the height of the gaussian at the intersection point, and sqrt(-(a*d + b*c)/(a + c)) is the height at which the crossing bands touch.
     bandcross = (d/c) < (-b/a) ? true : false
@@ -45,6 +45,7 @@ function forwardProb(β::Float64, a::Float64, b::Float64, c::Float64, d::Float64
     # So we will look for the roots in these intervals. These values are independent of whether the bands cross.
     x0 = find_zero(l_min, (-(β + pi*b)/(pi*a), -b/a), Bisection())
     x3 = find_zero(r_min, (d/c, (β + pi*d)/(pi*c)), Bisection())
+
     # Perform the gaussian integrals. These are independent of whether the bands cross.
     A = quadgk(gaussian, -Inf, x0)[1]
     B = quadgk(gaussian, x3, Inf)[1]
@@ -57,7 +58,7 @@ function forwardProb(β::Float64, a::Float64, b::Float64, c::Float64, d::Float64
         A += (2/(3a)) * (abs(-a*x0 - b)^1.5 - abs(-(a*d + b*c)/(a+c))^1.5)
         B += (2/(3c)) * (abs(-(a*d + b*c)/(a+c))^1.5 - abs(c*x3-d)^1.5)
     end
-    return A + B
+    return B-A
 end
 
 # This function generates a single data "point", consisting of a set of parameters and the corresponding function F(β, params)
@@ -77,11 +78,18 @@ function generateDataPoint(xmin::Float64, dx::Float64, xmax::Float64)
         a = abs(b)
         b = bs*temp
     end
+    
     if abs(c) < abs(d)
-        cs = sign(b)
+        cs = sign(d)
         temp = c
         c = abs(d)
         d = cs*temp
+    end
+    # no band crossing for this test
+    if (d/c) < (-b/a)
+        tmp, d = d, -b
+        b = -tmp
+        a, c = c, a
     end
 
     # Increases the chance that μ lies between the bands. The bands hit zero at -b/a and d/c, respectively. μ is selected at a random spot between these two points.
@@ -89,12 +97,14 @@ function generateDataPoint(xmin::Float64, dx::Float64, xmax::Float64)
     μ = (1-μ_t)*(-b/a) + μ_t*(d/c)
     # Calculate F(β, params) by calling forwardProb for each value of β.
     data1 = map(x -> forwardProb(x, a, b, c, d, μ), data1)
-    return (data1, [a, b, c, d, μ]) #Input/Output pair
+    return (data1, [a, b, c, d, μ]) # Input/Output pair
 end
+
 if length(ARGS) != 2
     println("Invalid arguments. Usage: julia data_gen.jl traindata.out testdata.out")
     exit(1)
 end
+
 println("Beginning setup...")
 xmin = 0.05
 dx = 0.01
@@ -108,6 +118,7 @@ ys = [g[2]]
 xg = [g2[1]]
 yg = [g2[2]]
 println("Setup complete, generating training and test data...")
+
 time = time_ns()
 # Prints a progress bar that will be updated during the calculation.
 print("Progress: |" * "-"^50 * ">")
@@ -141,15 +152,11 @@ for i in 1:test_frac*size # This is the number of points in the test set
 end
 gen_time = time_ns() - time
 
-#Bundles the data together.
+# Bundles the data together.
 traindata = collect(zip(xs, ys))
 testdata = collect(zip(xg, yg))
-#println(typeof(traindata))
-#println(typeof(traindata))
-#write(trainfile, traindata)
-#write(testfile, testdata)
 
-#Saves the data to files specified by the command line arguments.
+# Saves the data to files specified by the command line arguments.
 @save ARGS[1] traindata
 @save ARGS[2] testdata
 print("\n")

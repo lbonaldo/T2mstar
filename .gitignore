@@ -1,3 +1,4 @@
 *.out
+*.png
 Manifest.toml
 .ipynb_checkpoints/*

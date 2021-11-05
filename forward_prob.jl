@@ -1,18 +1,17 @@
 using Plots
 using QuadGK
 using Roots
-#using LsqFit
 using LaTeXStrings
-pyplot()
+#pyplot()
 
-#Generates the coeffcients for the sqrt functions. 
+# Generates the coeffcients for the sqrt functions. 
 # a and c are strictly positive, since they determine the direction of the function.
 # b and d can be either positive of negative, since bands are allowed to cross.
 # 
-a,c = rand(Float64, 2)
+a, c = rand(Float64, 2)
 b, d = rand(Float64, 2) .* sign.(randn(Float64, 2))
 
-#Since the intersection point for both bands is -b/a and d/c, respectively, 
+# Since the intersection point for both bands is -b/a and d/c, respectively, 
 # if a or c are sufficiently small our band positions can be pretty crazy. 
 # This is just a sanity check to makes sure that they aren't, so 
 # that μ always lies between -1 and 1. This makes it a bit more ML friendly.
@@ -23,14 +22,23 @@ if abs(a) < abs(b)
     a = abs(b)
     b = bs*temp
 end
+
 if abs(c) < abs(d)
-    cs = sign(b)
+    cs = sign(d)
     temp = c
     c = abs(d)
     d = cs*temp
 end
 
-#Increases the chance that μ lies between the bands
+# no band crossing for this test
+if (d/c) < (-b/a)
+    tmp, d = d, -b
+    b = -tmp
+    a, c = c, a
+end
+
+
+# Increases the chance that μ lies between the bands
 # The bands hit zero at -b/a and d/c, respectively.
 # μ is selected at a random spot between these two points.
 μ_t = rand(Float64)
@@ -49,6 +57,7 @@ function l(x)
         return 0
     end
 end
+
 function r(x)
     if c*x - d > 0
         return sqrt(c*x - d)
@@ -83,6 +92,9 @@ function forwardProb(β)
     # x0 ∈ [-(β + πb)/πa, -b/a] and x3 ∈ [d/c, (β + πd)/πc]
     # So we will look for the roots in these intervals.
     # These values are independent of whether the bands cross.
+    @show a,c,b,d,μ,β
+    println(l_min)
+    println((-(β + pi*b)/(pi*a), -b/a))
     x0 = find_zero(l_min, (-(β + pi*b)/(pi*a), -b/a), Bisection())
     x3 = find_zero(r_min, (d/c, (β + pi*d)/(pi*c)), Bisection())
     #Perform the gaussian integrals. These are independent of whether the bands cross.
@@ -105,11 +117,11 @@ function forwardProb(β)
         plot!(fig, [x0, (d-b)/(a+c), x3], [l(x0), sqrt(-(a*d + b*c)/(a + c)), r(x3)], seriestype=:scatter, label="Intersection Points", lw=3)
     end
     display(fig)
-    return A + B
+    return B-A
 end
 #println(forwardProb(1.0))
-X = collect(0.01:0.05:2)
+X = collect(0.05:0.01:5.0)
 Y = forwardProb.(X)
-plt = plot(X, Y, label=L"$F($  $\underbar \!\!\! x, β)$", lw=2, xlabel=L"\beta", ylabel="F")
-savefig(plt, "example_plot.png")
-display(plt)
+#plt = plot(X, Y, label=L"$F($  $\underbar \!\!\! x, β)$", lw=2, xlabel=L"\beta", ylabel="F")
+#savefig(plt, "example_plot.png")
+#display(plt)
