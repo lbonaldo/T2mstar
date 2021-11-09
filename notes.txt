@@ -1,0 +1,1 @@
+(inverse) bonal> python -m visdom.server
