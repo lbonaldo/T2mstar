@@ -112,8 +112,4 @@ batch_norm = True
 #
 use_permutation = True
 #
-<<<<<<< HEAD
 verbose_construction = False
-=======
-verbose_construction = False
->>>>>>> origin/main
