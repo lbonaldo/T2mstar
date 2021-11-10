@@ -24,6 +24,8 @@ def MMD_matrix_multiscale(x, y, widths_exponents):
         YY += C**a * ((C + dyy) / a)**-a
         XY += C**a * ((C + dxy) / a)**-a
 
+    debug_mmd_terms(XX, YY, XY)
+
     return XX + YY - 2.*XY
 
 
@@ -72,4 +74,4 @@ def debug_mmd_terms(XX, YY, XY):
     plt.title('XY')
     plt.colorbar()
 
-    plt.show()
+    plt.savefig("debug_mmd_terms.png")
