@@ -51,6 +51,9 @@ class Visualizer:
     def update_hist(self, *args):
         pass
 
+    def update_cov(self, data):
+        pass
+    
 
 class LiveVisualizer(Visualizer):
     def __init__(self, loss_labels):
