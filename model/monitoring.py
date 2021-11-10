@@ -51,6 +51,9 @@ class Visualizer:
     def update_hist(self, *args):
         pass
 
+    def update_cov(self, data):
+        pass
+
 
 class LiveVisualizer(Visualizer):
     def __init__(self, loss_labels):
@@ -61,7 +64,9 @@ class LiveVisualizer(Visualizer):
         self.n_plots = 3
         self.figsize = (4,4)
 
-        self.viz = visdom.Visdom()
+        cfg = {"server": "gateway-03", "port": 8099}
+        self.vis = visdom.Visdom('http://' + cfg["server"], port = cfg["port"])
+
         self.viz.close()
 
         self.l_plots = self.viz.line(X = np.zeros((1,self.n_losses)), 

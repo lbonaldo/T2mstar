@@ -2,3 +2,11 @@
 *.png
 Manifest.toml
 .ipynb_checkpoints/*
+.idea/
+.vscode/
+ardizzone/
+data/
+model/__pycache__/
+model/output/
+model/*.err
+model/results
