@@ -1,0 +1,13 @@
+#!/bin/bash
+
+#SBATCH -N 1
+#SBATCH -n 4
+#SBATCH -t 03:59:00
+#SBATCH --mem-per-cpu=16GB
+#SBATCH --gpus-per-node=v100:1
+#SBATCH -o ~/Documents/inverse_problem/inverse/model/results/out.out
+#SBATCH -e ~/Documents/inverse_problem/inverse/model/results/err.err
+#SBATCH -J inn
+
+
+python run.py > ./results/outfile

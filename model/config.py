@@ -13,7 +13,7 @@ filename_in     = ''
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
 # Use interactive visualization of losses and other plots. Requires visdom
-interactive_visualization = True
+interactive_visualization = False
 # Run a list of python functions at test time after eacch epoch
 # See toy_modes_train.py for reference example
 test_time_functions = []

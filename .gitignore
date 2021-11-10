@@ -8,3 +8,5 @@ ardizzone/
 data/
 model/__pycache__/
 model/output/
+model/*.err
+model/results
