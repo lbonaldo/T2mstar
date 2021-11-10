@@ -1,3 +1,8 @@
+#import os
+
+#os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   
+#os.environ["CUDA_VISIBLE_DEVICES"]="1"
+
 from time import time
 
 import numpy as np
@@ -9,10 +14,9 @@ import model
 import monitoring
 import train
 
-
 def run():
     torch.multiprocessing.freeze_support()
-    
+
     monitoring.restart()
 
     try:
