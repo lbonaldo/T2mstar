@@ -32,7 +32,7 @@ class Visualizer:
             for l in loss_labels:
                 self.header += ' %15s' % (l)
 
-    def update_losses(self, losses):
+    def update_losses(self, losses, logscale=False):
         if self.header:
             print(self.header)
             self.header = None
@@ -44,9 +44,6 @@ class Visualizer:
 
         print(line)
         self.counter += 1
-
-    def update_images(self, *args):
-        pass
 
     def update_hist(self, *args):
         pass
@@ -139,10 +136,6 @@ def restart():
 
 def show_loss(losses, logscale=False):
     visualizer.update_losses(losses, logscale)
-
-
-def show_imgs(*imgs):
-    visualizer.update_images(*imgs)
 
 
 def show_hist(data):
