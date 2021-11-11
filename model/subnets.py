@@ -19,9 +19,9 @@ class FullyConnected(nn.Module):
         self.fc2b = nn.Linear(internal_size, internal_size)
         self.fc3 = nn.Linear(internal_size, dims_out)
 
-        self.nl1 = nn.LeakyReLU()
-        self.nl2 = nn.LeakyReLU()
-        self.nl2b = nn.LeakyReLU()
+        self.nl1 = nn.Tanh()
+        self.nl2 = nn.Tanh()
+        self.nl2b = nn.Tanh()
 
         if batch_norm:
             self.bn1 = nn.BatchNorm1d(internal_size)

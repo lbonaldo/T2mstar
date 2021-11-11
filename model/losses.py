@@ -20,9 +20,9 @@ def MMD_matrix_multiscale(x, y, widths_exponents):
                   torch.zeros(xx.shape).to(c.device))
 
     for C,a in widths_exponents:
-        XX += C**a * ((C + dxx) / a)**-a
-        YY += C**a * ((C + dyy) / a)**-a
-        XY += C**a * ((C + dxy) / a)**-a
+        XX += C**a * (C**a + dxx)**-1
+        YY += C**a * (C**a + dyy)**-1
+        XY += C**a * (C**a + dxy)**-1
 
 #    debug_mmd_terms(XX.detach().cpu(), YY.detach().cpu(), XY.detach().cpu())
 

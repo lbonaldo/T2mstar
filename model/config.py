@@ -47,7 +47,7 @@ test_time_functions = []
 # Initial learning rate
 lr_init         = 1.0e-3
 #Batch size
-batch_size      = 100
+batch_size      = 300
 # Total number of epochs to train for
 n_epochs        = 100
 # End the epoch after this many iterations (or when the train loader is exhausted)
@@ -92,9 +92,9 @@ train_reconstruction = True
 train_max_likelihood = True
 
 lambd_fit_forw       = 1.
-lambd_mmd_forw       = 5.
+lambd_mmd_forw       = 1.
 lambd_reconstruct    = 1.
-lambd_mmd_back       = 25.
+lambd_mmd_back       = 1.
 lambd_max_likelihood = 1.
 
 # Both for fitting, and for the reconstruction, perturb y with Gaussian
@@ -111,8 +111,8 @@ zeros_noise_scale = 5e-3
 # This is only used if mmd_back_weighted of train_max_likelihoiod are True.
 y_uncertainty_sigma = 0.12 * 4
 
-mmd_forw_kernels = [(0.2, 2), (1.5, 2), (3.0, 2)]
-mmd_back_kernels = [(0.2, 0.1), (0.2, 0.5), (0.2, 2)]
+mmd_forw_kernels = [(0.05, 2), (0.2, 2), (0.9, 2)]
+mmd_back_kernels = [(0.05, 2), (0.2, 2), (0.9, 2)]
 mmd_back_weighted = True
 
 ###########
@@ -128,7 +128,7 @@ exponent_clamping = 2.0
 #
 hidden_layer_sizes = 256
 #
-dropout_perc = 0.1
+dropout_perc = 0.2
 #
 batch_norm = True
 #
