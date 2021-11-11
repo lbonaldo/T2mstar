@@ -1,12 +1,34 @@
 '''Global configuration'''
+import os
+import sys
+from datetime import date, datetime
+
 import torch
+
+
+def create_testfolder():
+    tpath = "./results"
+    if not os.path.isdir(tpath): # if there is not a results folder -> create it
+        os.mkdir(tpath)
+    today_date = date.today().strftime("%b-%d-%Y")
+    tpath = os.path.join(tpath, today_date)
+    if not os.path.isdir(tpath): # if there is not a today folder -> create it
+        os.mkdir(tpath)
+    test_name = datetime.now().strftime("%H-%M-%S")
+    tpath = os.path.join(tpath, test_name)
+    os.mkdir(tpath)
+    return tpath
+
+test_path = create_testfolder()
 
 ######################
 #  General settings  #
 ######################
-
+# Filename to export print
+stdout_file = os.path.join(test_path, "out.txt")
+fileout = open(stdout_file, 'w')
 # Filename to save the model under
-filename_out    = 'output/inn.pt'
+filename_out    = os.path.join(test_path, 'inn.pt')
 # Model to load and continue training. Ignored if empty string
 filename_in     = ''
 # Compute device to perform the training on, 'cuda' or 'cpu'
@@ -25,7 +47,7 @@ test_time_functions = []
 # Initial learning rate
 lr_init         = 1.0e-3
 #Batch size
-batch_size      = 200
+batch_size      = 100
 # Total number of epochs to train for
 n_epochs        = 100
 # End the epoch after this many iterations (or when the train loader is exhausted)
@@ -70,20 +92,20 @@ train_reconstruction = True
 train_max_likelihood = True
 
 lambd_fit_forw       = 1.
-lambd_mmd_forw       = 50.
+lambd_mmd_forw       = 5.
 lambd_reconstruct    = 1.
-lambd_mmd_back       = 500.
+lambd_mmd_back       = 25.
 lambd_max_likelihood = 1.
 
 # Both for fitting, and for the reconstruction, perturb y with Gaussian
 # noise of this sigma
-add_y_noise     = 5e-2
+add_y_noise     = 5e-4
 # For reconstruction, perturb z
-add_z_noise     = 2e-2
+add_z_noise     = 2e-3
 # In all cases, perturb the zero padding
-add_pad_noise   = 1e-2
+add_pad_noise   = 1e-3
 
-zeros_noise_scale = 5e-2
+zeros_noise_scale = 5e-3
 
 # For noisy forward processes, the sigma on y (assumed equal in all dimensions).
 # This is only used if mmd_back_weighted of train_max_likelihoiod are True.
@@ -100,13 +122,13 @@ mmd_back_weighted = True
 # Initialize the model parameters from a normal distribution with this sigma
 init_scale = 0.10
 #
-N_blocks   = 6
+N_blocks   = 4
 #
 exponent_clamping = 2.0
 #
-hidden_layer_sizes = 128
+hidden_layer_sizes = 256
 #
-dropout_perc = 0.2
+dropout_perc = 0.1
 #
 batch_norm = True
 #

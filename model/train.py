@@ -86,6 +86,7 @@ def train_epoch(i_epoch, test=False):
             y = torch.cat((c.add_pad_noise * noise_batch(c.ndim_pad_zy), y), dim=1)
         y = torch.cat((noise_batch(c.ndim_z), y), dim=1)
 
+        # forward step
         out_y, jac = model.model(x)
 
         if c.train_max_likelihood:
