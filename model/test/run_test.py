@@ -69,47 +69,11 @@ def inference(data_path, model_path):
             coeff_pred, _ = model.model(torch.cat(cat_inputs, 1), rev=True)
             results.append((coeff_pred, coeff_true))
             break
-
-    xarr = np.arange(-5,5,0.05)
-    l_true = np.empty(len(xarr))
-    r_true = np.empty(len(xarr))
-    g_true = np.empty(len(xarr))
-    l_pred = np.empty(len(xarr))
-    r_pred = np.empty(len(xarr))
-    g_pred = np.empty(len(xarr))
-
+    
     for i in range(10):
-        a_pred = results[0][0][i, :c.ndim_x].detach().cpu().numpy()[0]
-        b_pred = results[0][0][i, :c.ndim_x].detach().cpu().numpy()[1]
-        c_pred = results[0][0][i, :c.ndim_x].detach().cpu().numpy()[2]
-        d_pred = results[0][0][i, :c.ndim_x].detach().cpu().numpy()[3]
-        mu_pred = results[0][0][i, :c.ndim_x].detach().cpu().numpy()[4]
-        beta_pred = results[0][0][i, :c.ndim_x].detach().cpu().numpy()[5]
-        a_true = results[0][1][i,0]
-        b_true = results[0][1][i,1]
-        c_true = results[0][1][i,2]
-        d_true = results[0][1][i,3]
-        mu_true = results[0][1][i,4]
-        beta_true = results[0][1][i,5]
-        
-        for j,x in enumerate(xarr):
-            l_true[j] = l(x, a_true, b_true)
-            r_true[j] = r(x, c_true, d_true)
-            g_true[j] = g(x, beta_true, mu_true)
-            l_pred[j] = l(x, a_pred, b_pred)
-            r_pred[j] = r(x, c_pred, d_pred)
-            g_pred[j] = g(x, beta_pred, mu_pred)
-
-        fig = plt.figure(figsize=(10,6))
-        plt.plot(xarr,l_true, color='#1f77b4', label="l_true")
-        plt.plot(xarr,r_true, color='#1f77b4',  label="r_true")
-        plt.plot(xarr,g_true, color='#1f77b4',  label="g_true")
-        plt.plot(xarr,l_pred, color='#ff7f0e', label="l_pred")
-        plt.plot(xarr,r_pred, color='#ff7f0e',  label="r_pred")
-        plt.plot(xarr,g_pred, color='#ff7f0e',  label="g_pred")
-        plt.legend()
-        plt.savefig("plot_pred_{}".format(i))
-
+        pred = results[0][0][i, :c.ndim_x].detach().cpu().numpy()
+        true = results[0][1][i,:]
+        np.savetxt("./data/coeff_{}.csv".format(i), np.stack((pred, true)), delimiter=",")
     return
 
 
