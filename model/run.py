@@ -18,7 +18,9 @@ def run():
     torch.multiprocessing.freeze_support()
 
     monitoring.restart()
-
+    if c.device is "cuda":
+        print(torch.cuda.get_device_name(0))        
+        c.log(torch.cuda.get_device_name(0), c.logfile)
     running_loss = np.Inf
     try:
         monitoring.print_config()
@@ -45,9 +47,8 @@ def run():
 
     finally:
         print("\n\nTraining took %f minutes\n\n" % ((time()-t_start)/60.))        
-        c.fileout.write("\n\nTraining took %f minutes\n\n" % ((time()-t_start)/60.))
+        c.log("\n\nTraining took %f minutes\n\n" % ((time()-t_start)/60.), c.logfile)
         model.save(c.filename_out)
-        c.fileout.close()
 
 
 # TODO: add evaluation

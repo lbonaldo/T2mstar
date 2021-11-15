@@ -98,7 +98,7 @@ def train_epoch(i_epoch, test=False):
         if c.train_forward_mmd:
             l_mmd_f = loss_forward_mmd(out_y, y)
             batch_losses.extend(l_mmd_f)
-            l_forw += l_mmd_f
+            l_forw += sum(l_mmd_f)
 
         if not test:
             l_forw.backward()

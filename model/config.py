@@ -7,7 +7,7 @@ import torch
 
 
 def create_testfolder():
-    tpath = "./results"
+    tpath = "/mnt/scratch/bonal1lCMICH/results"
     if not os.path.isdir(tpath): # if there is not a results folder -> create it
         os.mkdir(tpath)
     today_date = date.today().strftime("%b-%d-%Y")
@@ -19,21 +19,28 @@ def create_testfolder():
     os.mkdir(tpath)
     return tpath
 
+def log(string, filepath):
+    with open(filepath, 'a') as f:
+        f.write(string)
+    
+
 test_path = create_testfolder()
 
 ######################
 #  General settings  #
 ######################
+
 # Filename to export print
-stdout_file = os.path.join(test_path, "out.txt")
-fileout = open(stdout_file, 'w')
+logfile         = os.path.join(test_path, "out.txt")
 # Filename to save the model under
 filename_out    = os.path.join(test_path, 'inn.pt')
+# Data folder
+data_path       = "/mnt/scratch/bonal1lCMICH/data"
 # Model to load and continue training. Ignored if empty string
 filename_in     = ''
 # Compute device to perform the training on, 'cuda' or 'cpu'
-use_cuda = torch.cuda.is_available()
-device = torch.device("cuda" if use_cuda else "cpu")
+use_cuda        = torch.cuda.is_available()
+device          = torch.device("cuda" if use_cuda else "cpu")
 # Use interactive visualization of losses and other plots. Requires visdom
 interactive_visualization = False
 # Run a list of python functions at test time after eacch epoch
@@ -45,9 +52,9 @@ test_time_functions = []
 #######################
 
 # Initial learning rate
-lr_init         = 1.0e-3
+lr_init         = 1.0e-2
 #Batch size
-batch_size      = 300
+batch_size      = 500
 # Total number of epochs to train for
 n_epochs        = 100
 # End the epoch after this many iterations (or when the train loader is exhausted)
@@ -66,12 +73,12 @@ adam_betas = (0.9, 0.95)
 #  Data dimensions  #
 #####################
 
-ndim_x     = 6
-ndim_pad_x = 2
+ndim_x     = 1
+ndim_pad_x = 9
 
-ndim_y     = 1
-ndim_z     = 5
-ndim_pad_zy = 2
+ndim_y     = 6
+ndim_z     = 4
+ndim_pad_zy = 0
 
 # Overwrite or import data loaders here.
 from dataloader import tr_loader, tst_loader
@@ -91,28 +98,28 @@ train_backward_mmd   = True
 train_reconstruction = True
 train_max_likelihood = True
 
-lambd_fit_forw       = 1.
+lambd_fit_forw       = 0.1
 lambd_mmd_forw       = 1.
-lambd_reconstruct    = 1.
-lambd_mmd_back       = 1.
-lambd_max_likelihood = 1.
+lambd_reconstruct    = 80.
+lambd_mmd_back       = 10.
+lambd_max_likelihood = 5e-4
 
 # Both for fitting, and for the reconstruction, perturb y with Gaussian
 # noise of this sigma
-add_y_noise     = 5e-4
+add_y_noise     = 5e-3
 # For reconstruction, perturb z
 add_z_noise     = 2e-3
 # In all cases, perturb the zero padding
 add_pad_noise   = 1e-3
 
-zeros_noise_scale = 5e-3
+zeros_noise_scale = 1e3
 
 # For noisy forward processes, the sigma on y (assumed equal in all dimensions).
 # This is only used if mmd_back_weighted of train_max_likelihoiod are True.
 y_uncertainty_sigma = 0.12 * 4
 
-mmd_forw_kernels = [(0.05, 2), (0.2, 2), (0.9, 2)]
-mmd_back_kernels = [(0.05, 2), (0.2, 2), (0.9, 2)]
+mmd_forw_kernels = [(0.2, 2), (1.5, 2), (0.2, 2)]
+mmd_back_kernels = [(0.2, 0.1), (0.2, 0.5), (0.2, 2)]
 mmd_back_weighted = True
 
 ###########
@@ -122,7 +129,7 @@ mmd_back_weighted = True
 # Initialize the model parameters from a normal distribution with this sigma
 init_scale = 0.10
 #
-N_blocks   = 4
+N_blocks   = 5
 #
 exponent_clamping = 2.0
 #
