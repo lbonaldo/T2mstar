@@ -1,16 +1,18 @@
+import os
 import numpy as np
+
 import torch
 import torch.utils.data
 
 import config as c
 
-x_train = torch.Tensor(np.load('../data/x_train.npy'))
-y_train = torch.Tensor(np.load('../data/y_train.npy'))
-y_train = y_train[:, None]
+x_train = torch.Tensor(np.load(os.path.join(c.data_path, 'I_train.npy')))
+x_train = x_train[:, None]
+y_train = torch.Tensor(np.load(os.path.join(c.data_path, 'coeff_train.npy')))
 
-x_test = torch.Tensor(np.load('../data/x_test.npy'))
-y_test = torch.Tensor(np.load('../data/y_test.npy'))
-y_test = y_test[:, None]
+x_test = torch.Tensor(np.load(os.path.join(c.data_path, 'I_test.npy')))
+x_test = x_test[:, None]
+y_test = torch.Tensor(np.load(os.path.join(c.data_path, 'coeff_test.npy')))
 
 tr_loader = torch.utils.data.DataLoader(
     torch.utils.data.TensorDataset(x_train, y_train),

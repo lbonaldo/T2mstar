@@ -1,5 +1,8 @@
 *.out
 *.png
+*.pt
+*~
+model/test/__pycache__/
 Manifest.toml
 .ipynb_checkpoints/*
 .idea/
