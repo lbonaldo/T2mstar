@@ -10,3 +10,6 @@ model/__pycache__/
 model/output/
 model/*.err
 model/results
+model/test/inn_rev.pt
+.gitignore
+model/test/inn.pt
