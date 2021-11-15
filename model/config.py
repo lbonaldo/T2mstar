@@ -54,7 +54,7 @@ test_time_functions = []
 # Initial learning rate
 lr_init         = 1.0e-2
 #Batch size
-batch_size      = 500
+batch_size      = 300
 # Total number of epochs to train for
 n_epochs        = 100
 # End the epoch after this many iterations (or when the train loader is exhausted)
@@ -73,11 +73,11 @@ adam_betas = (0.9, 0.95)
 #  Data dimensions  #
 #####################
 
-ndim_x     = 1
-ndim_pad_x = 9
+ndim_x     = 6
+ndim_pad_x = 0
 
-ndim_y     = 6
-ndim_z     = 4
+ndim_y     = 1
+ndim_z     = 5
 ndim_pad_zy = 0
 
 # Overwrite or import data loaders here.
@@ -106,11 +106,11 @@ lambd_max_likelihood = 5e-4
 
 # Both for fitting, and for the reconstruction, perturb y with Gaussian
 # noise of this sigma
-add_y_noise     = 5e-3
+add_y_noise     = 0.0
 # For reconstruction, perturb z
 add_z_noise     = 2e-3
 # In all cases, perturb the zero padding
-add_pad_noise   = 1e-3
+add_pad_noise   = 0.0
 
 zeros_noise_scale = 1e3
 
@@ -129,7 +129,7 @@ mmd_back_weighted = True
 # Initialize the model parameters from a normal distribution with this sigma
 init_scale = 0.10
 #
-N_blocks   = 5
+N_blocks   = 6
 #
 exponent_clamping = 2.0
 #

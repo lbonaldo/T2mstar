@@ -14,5 +14,7 @@ model/output/
 model/*.err
 model/results
 model/test/inn_rev.pt
+model/test/data/
 .gitignore
 model/test/inn.pt
+model/job.qsub.*
