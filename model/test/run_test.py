@@ -33,7 +33,10 @@ def g(x, beta, mu):
     return np.sqrt(beta/np.pi)*np.exp(-beta*(x - mu)**2)
 
 
-def inference(data_path, model_path):
+def inference(data_path, model_path, test_name):
+    export_path = os.path.join(test_name)
+    if not os.path.isdir(export_path):
+        os.mkdir(tpath)
     # PARAMETERS
     batch_size = 1
     workers = 4
@@ -73,7 +76,7 @@ def inference(data_path, model_path):
     for i in range(10):
         pred = results[0][0][i, :c.ndim_x].detach().cpu().numpy()
         true = results[0][1][i,:]
-        np.savetxt("./data/coeff_{}.csv".format(i), np.stack((pred, true)), delimiter=",")
+        np.savetxt(export_path+"/coeff_{}.csv".format(i), np.stack((pred, true)), delimiter=",")
     return
 
 
@@ -156,4 +159,7 @@ def inference_rev(data_path, model_path):
 if __name__ == "__main__":
     data_path = "/mnt/scratch/bonal1lCMICH/data"
     model_path = "."
-    output = inference(data_path, model_path)
+    if len(sys.argv) == 1:
+        exit("Export folder name")
+    else:
+        output = inference(data_path, model_path, sys.argv[1])
