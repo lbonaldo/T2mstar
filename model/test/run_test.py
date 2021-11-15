@@ -33,10 +33,10 @@ def g(x, beta, mu):
     return np.sqrt(beta/np.pi)*np.exp(-beta*(x - mu)**2)
 
 
-def inference(data_path, model_path, test_name):
-    export_path = os.path.join(test_name)
+def inference(data_path, model_path):
+    export_path = os.path.join(model_path,"data")
     if not os.path.isdir(export_path):
-        os.mkdir(tpath)
+        os.mkdir(export_path)
     # PARAMETERS
     batch_size = 1
     workers = 4
@@ -158,8 +158,7 @@ def inference_rev(data_path, model_path):
 
 if __name__ == "__main__":
     data_path = "/mnt/scratch/bonal1lCMICH/data"
-    model_path = "."
     if len(sys.argv) == 1:
         exit("Export folder name")
     else:
-        output = inference(data_path, model_path, sys.argv[1])
+        output = inference(data_path, os.path.join("./results/", sys.argv[1]))
