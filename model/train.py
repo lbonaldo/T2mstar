@@ -51,6 +51,9 @@ def loss_reconstruction(out_y, y, x):
     cat_inputs.append(out_y[:, -c.ndim_y:] + c.add_y_noise * noise_batch(c.ndim_y))
 
     x_reconstructed, jac = model.model(torch.cat(cat_inputs, 1), rev=True)
+    print(x_reconstructed[1,:])
+    print(x[1,:])
+    print(losses.l2_fit(x_reconstructed, x))
     return c.lambd_reconstruct * losses.l2_fit(x_reconstructed, x)
 
 

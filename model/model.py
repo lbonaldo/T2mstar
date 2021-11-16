@@ -27,7 +27,7 @@ for i in range(c.N_blocks):
 
 nodes.append(FrEIA.framework.OutputNode([nodes[-1].out0], name='output'))
 
-model = FrEIA.framework.ReversibleGraphNet(nodes, verbose=c.verbose_construction)
+model = FrEIA.framework.GraphINN(nodes, verbose=c.verbose_construction)
 model.to(c.device)
 
 params_trainable = list(filter(lambda p: p.requires_grad, model.parameters()))

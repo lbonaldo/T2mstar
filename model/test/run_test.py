@@ -1,4 +1,5 @@
 import os
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -161,4 +162,4 @@ if __name__ == "__main__":
     if len(sys.argv) == 1:
         exit("Export folder name")
     else:
-        output = inference(data_path, os.path.join("./results/", sys.argv[1]))
+        output = inference(data_path, sys.argv[1])

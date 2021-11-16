@@ -74,11 +74,11 @@ adam_betas = (0.9, 0.95)
 #####################
 
 ndim_x     = 6
-ndim_pad_x = 0
+ndim_pad_x = 2
 
 ndim_y     = 1
 ndim_z     = 5
-ndim_pad_zy = 0
+ndim_pad_zy = 2
 
 # Overwrite or import data loaders here.
 from dataloader import tr_loader, tst_loader
@@ -96,7 +96,7 @@ assert (ndim_x + ndim_pad_x
 train_forward_mmd    = True
 train_backward_mmd   = True
 train_reconstruction = True
-train_max_likelihood = True
+train_max_likelihood = False
 
 lambd_fit_forw       = 0.1
 lambd_mmd_forw       = 1.
@@ -106,11 +106,11 @@ lambd_max_likelihood = 5e-4
 
 # Both for fitting, and for the reconstruction, perturb y with Gaussian
 # noise of this sigma
-add_y_noise     = 0.0
+add_y_noise     = 5e-3
 # For reconstruction, perturb z
 add_z_noise     = 2e-3
 # In all cases, perturb the zero padding
-add_pad_noise   = 0.0
+add_pad_noise   = 1e-3
 
 zeros_noise_scale = 1e3
 
