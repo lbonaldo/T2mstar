@@ -54,7 +54,7 @@ test_time_functions = []
 # Initial learning rate
 lr_init         = 1.0e-2
 #Batch size
-batch_size      = 500
+batch_size      = 300
 # Total number of epochs to train for
 n_epochs        = 100
 # End the epoch after this many iterations (or when the train loader is exhausted)
@@ -73,12 +73,12 @@ adam_betas = (0.9, 0.95)
 #  Data dimensions  #
 #####################
 
-ndim_x     = 1
-ndim_pad_x = 9
+ndim_x     = 6
+ndim_pad_x = 2
 
-ndim_y     = 6
-ndim_z     = 4
-ndim_pad_zy = 0
+ndim_y     = 1
+ndim_z     = 5
+ndim_pad_zy = 2
 
 # Overwrite or import data loaders here.
 from dataloader import tr_loader, tst_loader
@@ -96,7 +96,7 @@ assert (ndim_x + ndim_pad_x
 train_forward_mmd    = True
 train_backward_mmd   = True
 train_reconstruction = True
-train_max_likelihood = True
+train_max_likelihood = False
 
 lambd_fit_forw       = 0.1
 lambd_mmd_forw       = 1.
@@ -129,7 +129,7 @@ mmd_back_weighted = True
 # Initialize the model parameters from a normal distribution with this sigma
 init_scale = 0.10
 #
-N_blocks   = 5
+N_blocks   = 6
 #
 exponent_clamping = 2.0
 #

@@ -36,7 +36,7 @@ def run():
 
             if test_losses[0] < running_loss:
                 model.save(c.filename_out)
-                running_loss = test_losses[0]
+                running_loss = test_losses[-1]
 
             monitoring.show_loss(np.concatenate([train_losses, test_losses]))
             model.scheduler_step()
