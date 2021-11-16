@@ -7,13 +7,60 @@ using DataFrames
 #pyplot()
 
 function f_export(idx::Int64, test_name)
-    filename = "coeff_$idx.csv"
-    data = Matrix{Float64}(CSV.read("./model/test/results/"*test_name*"/data/"*filename, DataFrame; delim=",", header=0))
+    data = rand(2,6)
 
-    a_pred,b_pred,c_pred,d_pred,μ_pred,β_pred = data[1,:]
-    a_true,b_true,c_true,d_true,μ_true,β_true = data[2,:]
+    a_pred,c_pred,a_true,c_true = rand(Float64, 4)
+    b_pred,d_pred,b_true,d_true = rand(Float64, 4) .* sign.(randn(Float64, 4))
+    betas = collect(0.05:0.01:5.0)
+    β_pred = betas[rand(1:length(betas))]
+    β_true = betas[rand(1:length(betas))]
 
+    if abs(a_true) < abs(b_true)
+        bs = sign(b_true)
+        temp = a_true
+        a_true = abs(b_true)
+        b_true = bs*temp
+    end
     
+    if abs(c_true) < abs(d_true)
+        cs = sign(d_true)
+        temp = c_true
+        c_true = abs(d_true)
+        d_true = cs*temp
+    end
+    
+    # no band crossing for this test
+    if (d_true/c_true) < (-b_true/a_true)
+        tmp, d_true = d_true, -b_true
+        b_true = -tmp
+        a_true, c_true = c_true, a_true
+    end
+
+    if abs(a_pred) < abs(b_pred)
+        bs = sign(b_pred)
+        temp = a_pred
+        a_pred = abs(b_pred)
+        b_pred = bs*temp
+    end
+    
+    if abs(c_pred) < abs(d_pred)
+        cs = sign(d_pred)
+        temp = c_pred
+        c_pred = abs(d_pred)
+        d_pred = cs*temp
+    end
+    
+    # no band crossing for this test
+    if (d_pred/c_pred) < (-b_pred/a_pred)
+        tmp, d_pred = d_pred, -b_pred
+        b_pred = -tmp
+        a_pred, c_pred = c_pred, a_pred
+    end
+    
+    μ_t = rand(Float64)
+    μ_true = (1-μ_t)*(-b_true/a_true) + μ_t*(d_true/c_true)
+    μ_pred = (1-μ_t)*(-b_pred/a_pred) + μ_t*(d_pred/c_pred)
+
     function l(x::Float64, a::Float64, b::Float64)
         if -a*x - b > 0
             return sqrt(-a*x - b)
@@ -102,8 +149,8 @@ function f_export(idx::Int64, test_name)
     savefig(plots_path*"/jplot_$idx.png")
 end
 
-test_name = "test_3_xcoeff_nopadd_nonoise"
-idxs = 0:1:9
+test_name = "test_4_random"
+idxs = 0:1:20
 for i in idxs
     f_export(i, test_name) 
 end
