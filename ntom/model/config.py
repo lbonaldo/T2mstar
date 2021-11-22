@@ -1,19 +1,48 @@
 '''Global configuration'''
+import os
+import sys
+from datetime import date, datetime
+
 import torch
+
+
+def create_testfolder():
+    tpath = "/mnt/scratch/bonal1lCMICH/results"
+    if not os.path.isdir(tpath): # if there is not a results folder -> create it
+        os.mkdir(tpath)
+    today_date = date.today().strftime("%b-%d-%Y")
+    tpath = os.path.join(tpath, today_date)
+    if not os.path.isdir(tpath): # if there is not a today folder -> create it
+        os.mkdir(tpath)
+    test_name = datetime.now().strftime("%H-%M-%S")
+    tpath = os.path.join(tpath, test_name)
+    os.mkdir(tpath)
+    return tpath
+
+def log(string, filepath):
+    with open(filepath, 'a') as f:
+        f.write(string)
+    
+
+test_path = create_testfolder()
 
 ######################
 #  General settings  #
 ######################
 
+# Filename to export print
+logfile         = os.path.join(test_path, "out.txt")
 # Filename to save the model under
-filename_out    = 'output/inn.pt'
+filename_out    = os.path.join(test_path, 'inn.pt')
+# Data folder
+data_path       = "/mnt/scratch/bonal1lCMICH/data"
 # Model to load and continue training. Ignored if empty string
 filename_in     = ''
 # Compute device to perform the training on, 'cuda' or 'cpu'
-use_cuda = torch.cuda.is_available()
-device = torch.device("cuda" if use_cuda else "cpu")
+use_cuda        = torch.cuda.is_available()
+device          = torch.device("cuda" if use_cuda else "cpu")
 # Use interactive visualization of losses and other plots. Requires visdom
-interactive_visualization = True
+interactive_visualization = False
 # Run a list of python functions at test time after eacch epoch
 # See toy_modes_train.py for reference example
 test_time_functions = []
@@ -23,9 +52,9 @@ test_time_functions = []
 #######################
 
 # Initial learning rate
-lr_init         = 1.0e-3
+lr_init         = 1.0e-2
 #Batch size
-batch_size      = 200
+batch_size      = 300
 # Total number of epochs to train for
 n_epochs        = 100
 # End the epoch after this many iterations (or when the train loader is exhausted)
@@ -69,27 +98,27 @@ train_backward_mmd   = True
 train_reconstruction = True
 train_max_likelihood = True
 
-lambd_fit_forw       = 1.
-lambd_mmd_forw       = 50.
-lambd_reconstruct    = 1.
-lambd_mmd_back       = 500.
-lambd_max_likelihood = 1.
+lambd_fit_forw       = 0.1
+lambd_mmd_forw       = 1.
+lambd_reconstruct    = 80.
+lambd_mmd_back       = 10.
+lambd_max_likelihood = 5e-4
 
 # Both for fitting, and for the reconstruction, perturb y with Gaussian
 # noise of this sigma
-add_y_noise     = 5e-2
+add_y_noise     = 5e-3
 # For reconstruction, perturb z
-add_z_noise     = 2e-2
+add_z_noise     = 2e-3
 # In all cases, perturb the zero padding
-add_pad_noise   = 1e-2
+add_pad_noise   = 1e-3
 
-zeros_noise_scale = 5e-2
+zeros_noise_scale = 1e3
 
 # For noisy forward processes, the sigma on y (assumed equal in all dimensions).
 # This is only used if mmd_back_weighted of train_max_likelihoiod are True.
 y_uncertainty_sigma = 0.12 * 4
 
-mmd_forw_kernels = [(0.2, 2), (1.5, 2), (3.0, 2)]
+mmd_forw_kernels = [(0.2, 2), (1.5, 2), (0.2, 2)]
 mmd_back_kernels = [(0.2, 0.1), (0.2, 0.5), (0.2, 2)]
 mmd_back_weighted = True
 
@@ -104,7 +133,7 @@ N_blocks   = 6
 #
 exponent_clamping = 2.0
 #
-hidden_layer_sizes = 128
+hidden_layer_sizes = 256
 #
 dropout_perc = 0.2
 #

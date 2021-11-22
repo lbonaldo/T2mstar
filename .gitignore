@@ -17,3 +17,4 @@ model/results
 model/test/inn_rev.pt
 .gitignore
 model/test/inn.pt
+ntom/data_*/

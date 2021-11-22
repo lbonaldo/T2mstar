@@ -18,7 +18,10 @@ def run():
     torch.multiprocessing.freeze_support()
 
     monitoring.restart()
-
+    if c.device is "cuda":
+        print(torch.cuda.get_device_name(0))        
+        c.log(torch.cuda.get_device_name(0), c.logfile)
+    running_loss = np.Inf
     try:
         monitoring.print_config()
         t_start = time()
@@ -31,6 +34,10 @@ def run():
             train_losses = train.train_epoch(i_epoch)
             test_losses  = train.train_epoch(i_epoch, test=True)
 
+            if test_losses[0] < running_loss:
+                model.save(c.filename_out)
+                running_loss = test_losses[-1]
+
             monitoring.show_loss(np.concatenate([train_losses, test_losses]))
             model.scheduler_step()
 
@@ -39,7 +46,8 @@ def run():
         raise
 
     finally:
-        print("\n\nTraining took %f minutes\n\n" % ((time()-t_start)/60.))
+        print("\n\nTraining took %f minutes\n\n" % ((time()-t_start)/60.))        
+        c.log("\n\nTraining took %f minutes\n\n" % ((time()-t_start)/60.), c.logfile)
         model.save(c.filename_out)
 
 

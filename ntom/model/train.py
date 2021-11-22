@@ -29,9 +29,9 @@ def loss_forward_mmd(out, y):
     output_block_grad = torch.cat((out[:, :c.ndim_z],
                                    out[:, -c.ndim_y:].data), dim=1)
     y_short = torch.cat((y[:, :c.ndim_z], y[:, -c.ndim_y:]), dim=1)
+    l_forw_mmd = c.lambd_mmd_forw  * torch.mean(losses.forward_mmd(output_block_grad, y_short))
 
     l_forw_fit = c.lambd_fit_forw * losses.l2_fit(out[:, c.ndim_z:], y[:, c.ndim_z:])
-    l_forw_mmd = c.lambd_mmd_forw  * torch.mean(losses.forward_mmd(output_block_grad, y_short))
 
     return l_forw_fit, l_forw_mmd
 
@@ -51,6 +51,9 @@ def loss_reconstruction(out_y, y, x):
     cat_inputs.append(out_y[:, -c.ndim_y:] + c.add_y_noise * noise_batch(c.ndim_y))
 
     x_reconstructed, jac = model.model(torch.cat(cat_inputs, 1), rev=True)
+    print(x_reconstructed[1,:])
+    print(x[1,:])
+    print(losses.l2_fit(x_reconstructed, x))
     return c.lambd_reconstruct * losses.l2_fit(x_reconstructed, x)
 
 
@@ -78,33 +81,46 @@ def train_epoch(i_epoch, test=False):
 
         x, y = Variable(x).to(c.device), Variable(y).to(c.device)
 
-        if c.add_y_noise > 0:
-            y += c.add_y_noise * noise_batch(c.ndim_y)
         if c.ndim_pad_x:
             x = torch.cat((x, c.add_pad_noise * noise_batch(c.ndim_pad_x)), dim=1)
+        if c.add_y_noise > 0:
+            y += c.add_y_noise * noise_batch(c.ndim_y)
         if c.ndim_pad_zy:
             y = torch.cat((c.add_pad_noise * noise_batch(c.ndim_pad_zy), y), dim=1)
         y = torch.cat((noise_batch(c.ndim_z), y), dim=1)
 
+        # forward step
         out_y, jac = model.model(x)
 
+        l_forw = 0.0
         if c.train_max_likelihood:
-            batch_losses.append(loss_max_likelihood(out_y, jac, y))
+            lml = loss_max_likelihood(out_y, jac, y)
+            batch_losses.append(lml)
+            l_forw += lml
 
         if c.train_forward_mmd:
-            batch_losses.extend(loss_forward_mmd(out_y, y))
+            l_mmd_f = loss_forward_mmd(out_y, y)
+            batch_losses.extend(l_mmd_f)
+            l_forw += sum(l_mmd_f)
 
+        if not test:
+            l_forw.backward()
+
+        l_back = 0.0
         if c.train_backward_mmd:
-            batch_losses.append(loss_backward_mmd(x, y))
+            l_mmd_b = loss_backward_mmd(x, y)
+            batch_losses.append(l_mmd_b)
+            l_back += l_mmd_b
 
         if c.train_reconstruction:
-            batch_losses.append(loss_reconstruction(out_y.data, y, x))
+            l_rec = loss_reconstruction(out_y.data, y, x)
+            batch_losses.append(l_rec)
+            l_back += l_rec
 
-        l_total = sum(batch_losses)
         loss_history.append([l.item() for l in batch_losses])
 
         if not test:
-            l_total.backward()
+            l_back.backward()
             model.optim_step()
 
     if test:

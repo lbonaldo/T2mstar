@@ -61,4 +61,5 @@ def load(name):
     try:
         optim.load_state_dict(state_dicts['opt'])
     except ValueError:
+        c.log('Cannot load optimizer for some reason or other', c.logfile)
         print('Cannot load optimizer for some reason or other')
