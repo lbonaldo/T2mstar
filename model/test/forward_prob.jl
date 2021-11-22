@@ -102,8 +102,17 @@ function f_export(idx::Int64, test_name)
     savefig(plots_path*"/jplot_$idx.png")
 end
 
-test_name = "test_3_xcoeff_nopadd_nonoise"
+if length(ARGS) != 1
+    println("Invalid arguments. Usage: forward_prob.jl test_name")
+    exit(1)
+end
+
+test_name = ARGS[1]
 idxs = 0:1:9
 for i in idxs
-    f_export(i, test_name) 
+    try
+        f_export(i, test_name) 
+    catch DomainError
+        continue
+    end
 end
