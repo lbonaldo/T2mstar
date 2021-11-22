@@ -1,5 +1,5 @@
 import torch.nn as nn
-import config as c
+import test_config as c
 
 class FullyConnected(nn.Module):
     '''Fully connected tranformation, not reversible, but used below.'''

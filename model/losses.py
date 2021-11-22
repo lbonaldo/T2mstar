@@ -20,11 +20,11 @@ def MMD_matrix_multiscale(x, y, widths_exponents):
                   torch.zeros(xx.shape).to(c.device))
 
     for C,a in widths_exponents:
-        XX += C**a * ((C + dxx) / a)**-a
-        YY += C**a * ((C + dyy) / a)**-a
-        XY += C**a * ((C + dxy) / a)**-a
+        XX += C**a * (C**a + dxx)**-1
+        YY += C**a * (C**a + dyy)**-1
+        XY += C**a * (C**a + dxy)**-1
 
-    debug_mmd_terms(XX, YY, XY)
+#    debug_mmd_terms(XX.detach().cpu(), YY.detach().cpu(), XY.detach().cpu())
 
     return XX + YY - 2.*XY
 
@@ -52,8 +52,6 @@ def l2_fit(input, target):
 
 def debug_mmd_terms(XX, YY, XY):
 
-    plt.figure()
-
     plt.subplot(2,2,1)
     plt.imshow((XX + YY - XY - XY.t()).data.numpy(), cmap='jet')
     plt.title('Tot')
@@ -74,4 +72,7 @@ def debug_mmd_terms(XX, YY, XY):
     plt.title('XY')
     plt.colorbar()
 
-    plt.savefig("debug_mmd_terms.png")
+    plt.savefig("./results/debug_mmd_terms1.png")
+    plt.close()
+    plt.cla()
+    plt.clf()

@@ -1,1 +1,16 @@
 (inverse) bonal> python -m visdom.server
+
+Pipeline on the cluster
+
+TRAINING
+- edit config.py with appropriate parameters
+- qsub job.qsub
+TEST
+- create a folder for new test
+- cp inn.pt from scratch inside that folder
+- create info file with path to info in scratch
+- python run_test.py results/test_3_xcoeff_nopadd_nonoise/
+- scp -r bonal1lCMICH@hpcc.msu.edu:/mnt/home/bonal1lCMICH/Documents/inverse_problem/inverse/model/test/results/test_3_xcoeff_nopadd_nonoise/data/*.csv data/ copy the results in the same test folder locally to create plots with julia
+- change test folder name and number of plots "idxs" in the forward_prob.jl file
+- open julia, activate env and then run 
+- include("model/test/results/test_4_random/forward_prob.jl")

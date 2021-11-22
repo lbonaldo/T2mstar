@@ -1,5 +1,9 @@
+model/to_understand
 *.out
 *.png
+*.pt
+*~
+model/test/__pycache__/
 Manifest.toml
 .ipynb_checkpoints/*
 .idea/
@@ -10,3 +14,6 @@ model/__pycache__/
 model/output/
 model/*.err
 model/results
+model/test/inn_rev.pt
+.gitignore
+model/test/inn.pt

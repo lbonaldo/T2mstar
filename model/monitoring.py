@@ -9,7 +9,7 @@ def print_config():
     config_str += "Config options:\n\n"
 
     listname_configscope = dir(c)
-    for s in ['torch', 'tr_loader', 'train_loader', 'tst_loader', 'test_loader', ]:
+    for s in ['torch', 'tr_loader', 'train_loader', 'tst_loader', 'test_loader', "os", "sys", "date", "datetime", "create_testfolder", "log"]:
         listname_configscope.remove(s)
 
     for v in listname_configscope:
@@ -18,7 +18,8 @@ def print_config():
         config_str += "  {:25}\t{}\n".format(v,s)
 
     config_str += "="*80 + "\n"
-
+    
+    c.log(config_str, c.logfile)
     print(config_str)
 
 
@@ -34,14 +35,17 @@ class Visualizer:
 
     def update_losses(self, losses, logscale=False):
         if self.header:
+            c.log(self.header, c.logfile)
             print(self.header)
             self.header = None
 
+        #c.log('\r'+'    '*20, c.logfile)
         print('\r', '    '*20, end='')
         line = '\r%6.3i' % (self.counter)
         for l in losses:
             line += '  %14.4f' % (l)
 
+        c.log(line+"\n", c.logfile)
         print(line)
         self.counter += 1
 
