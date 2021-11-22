@@ -41,11 +41,11 @@ Threads.@threads for k in eachindex(index)
 end
 
 data = np.asarray(x_train)
-np.save("data/x_train.npy",data)
+np.save("data/coeff_train.npy",data)
 data = np.asarray(y_train)
-np.save("data/y_train.npy",data)
+np.save("data/I_train.npy",data)
 
-num_rows = Int64(round(length(testdata)*frac))
+num_rows = Int64(round(length(testdata)))
 num_column = length(testdata[1][1])
 num_params = length(testdata[1][2])+1
 
@@ -69,6 +69,6 @@ Threads.@threads for k in eachindex(index)
 end
 
 data = np.asarray(x_test)
-np.save("data/x_test.npy",data)
+np.save("data/coeff_test.npy",data)
 data = np.asarray(y_test)
-np.save("data/y_test.npy",data)
+np.save("data/I_test.npy",data)
