@@ -31,7 +31,7 @@ def loss_forward_mmd(out, y):
     y_short = torch.cat((y[:, :c.ndim_z], y[:, -c.ndim_y:]), dim=1)
     l_forw_mmd = c.lambd_mmd_forw  * torch.mean(losses.forward_mmd(output_block_grad, y_short))
 
-    l_forw_fit = c.lambd_fit_forw * losses.l2_fit(out[:, c.ndim_z:], y[:, c.ndim_z:])
+    l_forw_fit = c.lambd_fit_forw * losses.l2_fit(out[:, -c.ndim_y:], y[:, -c.ndim_y:])
 
     return l_forw_fit, l_forw_mmd
 
