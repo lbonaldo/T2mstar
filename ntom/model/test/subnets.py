@@ -1,5 +1,5 @@
 import torch.nn as nn
-import test_config as c
+import config as c
 
 class FullyConnected(nn.Module):
     '''Fully connected tranformation, not reversible, but used below.'''
@@ -18,6 +18,10 @@ class FullyConnected(nn.Module):
         self.fc2 = nn.Linear(internal_size, internal_size)
         self.fc2b = nn.Linear(internal_size, internal_size)
         self.fc3 = nn.Linear(internal_size, dims_out)
+
+        # self.nl1 = nn.LeakyReLU()
+        # self.nl2 = nn.LeakyReLU()
+        # self.nl2b = nn.LeakyReLU()
 
         self.nl1 = nn.Tanh()
         self.nl2 = nn.Tanh()
