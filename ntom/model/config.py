@@ -7,7 +7,7 @@ import torch
 
 
 def create_testfolder():
-    tpath = "/mnt/scratch/bonal1lCMICH/results"
+    tpath = "/mnt/scratch/bonal1lCMICH/inverse/ntom/results"
     if not os.path.isdir(tpath): # if there is not a results folder -> create it
         os.mkdir(tpath)
     today_date = date.today().strftime("%b-%d-%Y")
@@ -35,7 +35,7 @@ logfile         = os.path.join(test_path, "out.txt")
 # Filename to save the model under
 filename_out    = os.path.join(test_path, 'inn.pt')
 # Data folder
-data_path       = "/mnt/scratch/bonal1lCMICH/data"
+data_path       = "/mnt/scratch/bonal1lCMICH/inverse/ntom/data/65"
 # Model to load and continue training. Ignored if empty string
 filename_in     = ''
 # Compute device to perform the training on, 'cuda' or 'cpu'
@@ -54,7 +54,7 @@ test_time_functions = []
 # Initial learning rate
 lr_init         = 1.0e-2
 #Batch size
-batch_size      = 300
+batch_size      = 200
 # Total number of epochs to train for
 n_epochs        = 100
 # End the epoch after this many iterations (or when the train loader is exhausted)
@@ -65,7 +65,7 @@ pre_low_lr      = 0
 # Decay exponentially each epoch, to final_decay*lr_init at the last epoch.
 final_decay     = 0.02
 # L2 weight regularization of model parameters
-l2_weight_reg   = 1e-5
+l2_weight_reg   = 1e-6
 # Parameters beta1, beta2 of the Adam optimizer
 adam_betas = (0.9, 0.95)
 
@@ -73,12 +73,12 @@ adam_betas = (0.9, 0.95)
 #  Data dimensions  #
 #####################
 
-ndim_x     = 10
-ndim_pad_x = 2
+ndim_x     = 6
+ndim_pad_x = 0
 
-ndim_y     = 9
+ndim_y     = 5
 ndim_z     = 1
-ndim_pad_zy = 2
+ndim_pad_zy = 0
 
 # Overwrite or import data loaders here.
 from dataloader import tr_loader, tst_loader
@@ -98,19 +98,19 @@ train_backward_mmd   = True
 train_reconstruction = True
 train_max_likelihood = True
 
-lambd_fit_forw       = 0.1
-lambd_mmd_forw       = 1.
-lambd_reconstruct    = 80.
+lambd_fit_forw       = 1
+lambd_mmd_forw       = 10.
+lambd_reconstruct    = 1.
 lambd_mmd_back       = 10.
-lambd_max_likelihood = 5e-4
+lambd_max_likelihood = 0.1
 
 # Both for fitting, and for the reconstruction, perturb y with Gaussian
 # noise of this sigma
-add_y_noise     = 5e-3
+add_y_noise     = 5e-4
 # For reconstruction, perturb z
-add_z_noise     = 2e-3
+add_z_noise     = 2e-4
 # In all cases, perturb the zero padding
-add_pad_noise   = 1e-3
+add_pad_noise   = 1e-4
 
 zeros_noise_scale = 1e3
 
@@ -129,13 +129,13 @@ mmd_back_weighted = True
 # Initialize the model parameters from a normal distribution with this sigma
 init_scale = 0.10
 #
-N_blocks   = 6
+N_blocks   = 4
 #
 exponent_clamping = 2.0
 #
-hidden_layer_sizes = 256
+hidden_layer_sizes = 128
 #
-dropout_perc = 0.2
+dropout_perc = 0.3
 #
 batch_norm = True
 #

@@ -18,3 +18,7 @@ model/test/inn_rev.pt
 .gitignore
 model/test/inn.pt
 ntom/data_*/
+model/job.qsub.*
+model/test/results
+ntom/model/__pycache__/
+ntom/model/job.qsub.*

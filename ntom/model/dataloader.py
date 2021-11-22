@@ -6,13 +6,28 @@ import torch.utils.data
 
 import config as c
 
-y_train = torch.Tensor(np.load(os.path.join(c.data_path, 'I_train.npy')))
-y_train = y_train[:, None]
-x_train = torch.Tensor(np.load(os.path.join(c.data_path, 'coeff_train.npy')))
 
-y_test = torch.Tensor(np.load(os.path.join(c.data_path, 'I_test.npy')))
-y_test = y_test[:, None]
-x_test = torch.Tensor(np.load(os.path.join(c.data_path, 'coeff_test.npy')))
+x_train_ = torch.Tensor(np.load(os.path.join(c.data_path, 'x_train.npy')))
+y_train_ = torch.Tensor(np.load(os.path.join(c.data_path, 'y_train.npy')))
+train_size = x_train_.shape[0]
+
+x_val_ = torch.Tensor(np.load(os.path.join(c.data_path, 'x_val.npy')))
+y_val_ = torch.Tensor(np.load(os.path.join(c.data_path, 'y_val.npy')))
+val_size = x_val_.shape[0]
+
+x = torch.cat((x_train_, x_val_), dim=0)
+x_mean = x.mean(dim=0, keepdim=True)
+x_std = x.std(dim=0, keepdim=True)
+x_norm = (x - x_mean) / x_std
+x_train = x_norm[:train_size,:]
+x_test = x_norm[train_size:train_size+val_size,:]
+
+y = torch.cat((y_train_, y_val_), dim=0)
+y_mean = y.mean(dim=0, keepdim=True)
+y_std = y.std(dim=0, keepdim=True)
+y_norm = (y - y_mean) / y_std
+y_train = y_norm[:train_size,:] 
+y_test = y_norm[train_size:train_size+val_size,:]
 
 tr_loader = torch.utils.data.DataLoader(
     torch.utils.data.TensorDataset(x_train, y_train),

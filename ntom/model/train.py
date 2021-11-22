@@ -21,6 +21,11 @@ def loss_max_likelihood(out, jac, y):
                      + 0.5 * torch.sum(out[:, :c.ndim_z]**2, 1)
                      - jac)
 
+    print("first: ", torch.sum((out[:, -c.ndim_y:] - y[:, -c.ndim_y:])**2, 1))
+    print("second: ", torch.sum((out[:, c.ndim_z:-c.ndim_y] - y[:, c.ndim_z:-c.ndim_y])**2, 1))
+    print("third: ", torch.sum(out[:, :c.ndim_z]**2, 1))
+    print("-jac", -jac)
+    print(0.5 / c.y_uncertainty_sigma**2, "\t", 0.5 / c.zeros_noise_scale**2, "\t", 0.5)
     return c.lambd_max_likelihood * torch.mean(neg_log_likeli)
 
 
@@ -31,7 +36,7 @@ def loss_forward_mmd(out, y):
     y_short = torch.cat((y[:, :c.ndim_z], y[:, -c.ndim_y:]), dim=1)
     l_forw_mmd = c.lambd_mmd_forw  * torch.mean(losses.forward_mmd(output_block_grad, y_short))
 
-    l_forw_fit = c.lambd_fit_forw * losses.l2_fit(out[:, c.ndim_z:], y[:, c.ndim_z:])
+    l_forw_fit = c.lambd_fit_forw * losses.l2_fit(out[:, -c.ndim_y:], y[:, -c.ndim_y:])
 
     return l_forw_fit, l_forw_mmd
 
@@ -51,9 +56,6 @@ def loss_reconstruction(out_y, y, x):
     cat_inputs.append(out_y[:, -c.ndim_y:] + c.add_y_noise * noise_batch(c.ndim_y))
 
     x_reconstructed, jac = model.model(torch.cat(cat_inputs, 1), rev=True)
-    print(x_reconstructed[1,:])
-    print(x[1,:])
-    print(losses.l2_fit(x_reconstructed, x))
     return c.lambd_reconstruct * losses.l2_fit(x_reconstructed, x)
 
 

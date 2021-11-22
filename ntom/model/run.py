@@ -34,9 +34,14 @@ def run():
             train_losses = train.train_epoch(i_epoch)
             test_losses  = train.train_epoch(i_epoch, test=True)
 
-            if test_losses[0] < running_loss:
+            if test_losses[-1] < running_loss:
+                print("Best loss: ", running_loss)
+                print("New loss: ", test_losses[-1])
                 model.save(c.filename_out)
                 running_loss = test_losses[-1]
+                print("Model saved.")
+
+
 
             monitoring.show_loss(np.concatenate([train_losses, test_losses]))
             model.scheduler_step()
