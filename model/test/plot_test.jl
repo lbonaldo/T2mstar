@@ -113,6 +113,7 @@ for i in idxs
     try
         f_export(i, test_name) 
     catch DomainError
+        println("Domain error!")
         continue
     end
 end

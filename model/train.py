@@ -45,9 +45,12 @@ def loss_backward_mmd(x, y):
 
 
 def loss_reconstruction(out_y, y, x):
+    # z_var
     cat_inputs = [out_y[:, :c.ndim_z] + c.add_z_noise * noise_batch(c.ndim_z)]
+    # zy_pad_var
     if c.ndim_pad_zy:
         cat_inputs.append(out_y[:, c.ndim_z:-c.ndim_y] + c.add_pad_noise * noise_batch(c.ndim_pad_zy))
+    # y_var
     cat_inputs.append(out_y[:, -c.ndim_y:] + c.add_y_noise * noise_batch(c.ndim_y))
 
     x_reconstructed, jac = model.model(torch.cat(cat_inputs, 1), rev=True)
@@ -110,7 +113,7 @@ def train_epoch(i_epoch, test=False):
             l_back += l_mmd_b
 
         if c.train_reconstruction:
-            l_rec = loss_reconstruction(out_y.data, y, x)
+            l_rec = loss_reconstruction(out_y, y, x)
             batch_losses.append(l_rec)
             l_back += l_rec
 
