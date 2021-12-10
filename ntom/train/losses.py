@@ -11,23 +11,43 @@ def MMD_matrix_multiscale(x, y, widths_exponents):
     rx = (xx.diag().unsqueeze(0).expand_as(xx))
     ry = (yy.diag().unsqueeze(0).expand_as(yy))
 
-    dxx = torch.clamp(rx.t() + rx - 2.*xx, 0, np.inf)
-    dyy = torch.clamp(ry.t() + ry - 2.*yy, 0, np.inf)
-    dxy = torch.clamp(rx.t() + ry - 2.*xy, 0, np.inf)
+    if c.gauss_kernel:
+        dxx = torch.clamp(rx.t() + rx - 2.*xx, min=0)
+        dyy = torch.clamp(ry.t() + ry - 2.*yy, min=0)
+        dxy = torch.clamp(rx.t() + ry - 2.*xy, min=0)
+        
+        var = torch.zeros(xx.shape).to(c.device)
+        for h,e in widths_exponents:
+            h_inv = 1/(h**e)
+            dist = dxx + dyy - dxy
+            dist *= h_inv
+            var += torch.exp(-dist) 
+        return var
 
-    XX, YY, XY = (torch.zeros(xx.shape).to(c.device),
+    else:
+        dxx = torch.clamp(rx.t() + rx - 2.*xx, 0, np.inf)
+        dyy = torch.clamp(ry.t() + ry - 2.*yy, 0, np.inf)
+        dxy = torch.clamp(rx.t() + ry - 2.*xy, 0, np.inf)
+
+        XX, YY, XY = (torch.zeros(xx.shape).to(c.device),
                   torch.zeros(xx.shape).to(c.device),
                   torch.zeros(xx.shape).to(c.device))
 
-    for C,a in widths_exponents:
-        XX += C**a * (C**a + dxx)**-1
-        YY += C**a * (C**a + dyy)**-1
-        XY += C**a * (C**a + dxy)**-1
+        for h,e in widths_exponents:
+            XX += h**e * (h**e + dxx)**-1
+            YY += h**e * (h**e + dyy)**-1
+            XY += h**e * (h**e + dxy)**-1
 
-#    debug_mmd_terms(XX.detach().cpu(), YY.detach().cpu(), XY.detach().cpu())
+        return XX + YY - 2.*XY
 
-    return XX + YY - 2.*XY
 
+def l2_dist_matrix(x, y):
+    xx, yy, xy = torch.mm(x,x.t()), torch.mm(y,y.t()), torch.mm(x,y.t())
+
+    rx = (xx.diag().unsqueeze(0).expand_as(xx))
+    ry = (yy.diag().unsqueeze(0).expand_as(yy))
+
+    return torch.clamp(rx.t() + ry - 2.*xy, 0, np.inf)
 
 def forward_mmd(y0, y1):
     return MMD_matrix_multiscale(y0, y1, c.mmd_forw_kernels)
@@ -38,7 +58,7 @@ def backward_mmd(x0, x1):
 
 
 def l2_fit(pred, true):
-    torch.nn.functional.mse_loss(pred,true)
+    return torch.nn.functional.mse_loss(pred,true)
 #    return torch.sum((input - target)**2) / c.batch_size
 
 

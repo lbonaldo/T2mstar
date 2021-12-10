@@ -35,7 +35,7 @@ logfile         = os.path.join(test_path, "out.txt")
 # Filename to save the model under
 filename_out    = os.path.join(test_path, 'inn.pt')
 # Data folder
-data_path       = "/mnt/scratch/bonal1lCMICH/inverse/ntom/data/65"
+data_path       = "/mnt/scratch/bonal1lCMICH/inverse/ntom/data/64"
 # Model to load and continue training. Ignored if empty string
 filename_in     = ''
 # Compute device to perform the training on, 'cuda' or 'cpu'
@@ -52,9 +52,9 @@ test_time_functions = []
 #######################
 
 # Initial learning rate
-lr_init         = 1.0e-2
+lr_init         = 1.0e-3
 #Batch size
-batch_size      = 200
+batch_size      = 50
 # Total number of epochs to train for
 n_epochs        = 100
 # End the epoch after this many iterations (or when the train loader is exhausted)
@@ -65,7 +65,7 @@ pre_low_lr      = 0
 # Decay exponentially each epoch, to final_decay*lr_init at the last epoch.
 final_decay     = 0.02
 # L2 weight regularization of model parameters
-l2_weight_reg   = 1e-6
+l2_weight_reg   = 1e-06
 # Parameters beta1, beta2 of the Adam optimizer
 adam_betas = (0.9, 0.95)
 
@@ -74,11 +74,11 @@ adam_betas = (0.9, 0.95)
 #####################
 
 ndim_x     = 6
-ndim_pad_x = 0
+ndim_pad_x = 1
 
-ndim_y     = 5
-ndim_z     = 1
-ndim_pad_zy = 0
+ndim_y     = 4
+ndim_z     = 2
+ndim_pad_zy = 1
 
 # Overwrite or import data loaders here.
 from dataloader import tr_loader, tst_loader
@@ -100,27 +100,28 @@ train_max_likelihood = True
 
 lambd_fit_forw       = 1
 lambd_mmd_forw       = 10.
-lambd_reconstruct    = 1.
+lambd_reconstruct    = 10
 lambd_mmd_back       = 10.
-lambd_max_likelihood = 0.1
+lambd_max_likelihood = 0.01
 
 # Both for fitting, and for the reconstruction, perturb y with Gaussian
 # noise of this sigma
-add_y_noise     = 5e-4
+add_y_noise     = 0.0
 # For reconstruction, perturb z
-add_z_noise     = 2e-4
+add_z_noise     = 2e-3
 # In all cases, perturb the zero padding
 add_pad_noise   = 1e-4
-
+# increse/decrease contribution pad_yz to lml
 zeros_noise_scale = 1e3
 
 # For noisy forward processes, the sigma on y (assumed equal in all dimensions).
 # This is only used if mmd_back_weighted of train_max_likelihoiod are True.
-y_uncertainty_sigma = 0.12 * 4
+y_uncertainty_sigma = 0.1
 
 mmd_forw_kernels = [(0.2, 2), (1.5, 2), (0.2, 2)]
 mmd_back_kernels = [(0.2, 0.1), (0.2, 0.5), (0.2, 2)]
-mmd_back_weighted = True
+mmd_back_weighted = False
+gauss_kernel = False
 
 ###########
 #  Model  #
@@ -129,7 +130,7 @@ mmd_back_weighted = True
 # Initialize the model parameters from a normal distribution with this sigma
 init_scale = 0.10
 #
-N_blocks   = 4
+N_blocks   = 6
 #
 exponent_clamping = 2.0
 #
@@ -137,7 +138,7 @@ hidden_layer_sizes = 128
 #
 dropout_perc = 0.3
 #
-batch_norm = True
+batch_norm = False
 #
 use_permutation = True
 #

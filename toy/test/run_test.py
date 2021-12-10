@@ -43,7 +43,7 @@ def inference(model_path):
     batch_size = 1
     workers = 4
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model.model.train()
+    model.model.eval()
 
     # MODEL INITIALIZATION
     model.load(os.path.join(model_path, 'inn.pt'))
@@ -92,21 +92,23 @@ def inference(model_path):
             results.append((coeff_pred, coeff_true))
             break
     
+    diff = 0.0
     for i in range(10,20):
-        true = results[0][1][i,:]        
+        true = results[0][1][i,:].numpy()
         pred_norm = results[0][0][i, :c.ndim_x].detach().cpu()
         
         x_mean = torch.squeeze(x_mean)
         x_std = torch.squeeze(x_std)
-        pred = pred_norm*x_std + x_mean
-        
-        print(true)
-        print(pred_norm)
+        pred = (pred_norm*x_std + x_mean).numpy()
+        mae = np.mean(np.abs(pred-true))
+        print("MAE: ", mae)
+        diff += mae
         print(pred)
+        print(true)
 
-        np.savetxt(export_path+"/coeff_{}.csv".format(i-10), np.stack((pred, true)), delimiter=",")
+        np.savetxt(export_path+"/coeff_{}.csv".format(i), np.stack((pred, true)), delimiter=",")
+    print("total MAE: ", diff/10)
     return
-
 
 def inference_rev(data_path, model_path):
     # PARAMETERS

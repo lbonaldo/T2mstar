@@ -26,7 +26,7 @@ y = torch.cat((y_train_, y_val_), dim=0)
 y_mean = y.mean(dim=0, keepdim=True)
 y_std = y.std(dim=0, keepdim=True)
 y_norm = (y - y_mean) / y_std
-y_train = y_norm[:train_size,:] 
+y_train = y_norm[:train_size,:]
 y_test = y_norm[train_size:train_size+val_size,:]
 
 tr_loader = torch.utils.data.DataLoader(

@@ -12,4 +12,4 @@
 source ~/.bashrc
 conda activate inverse
 module load CUDA/10.1.105
-python run.py
+python run_test.py results/test_12/ true

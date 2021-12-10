@@ -50,15 +50,15 @@ zeros_noise_scale = 1e3
 # Initialize the model parameters from a normal distribution with this sigma
 init_scale = 0.10
 #
-N_blocks   = 6
+N_blocks   = 5
 #
-dropout_perc = 0.0
+dropout_perc = 0.4
 #
-batch_norm = True
+batch_norm = False
 #
 exponent_clamping = 2.0
 #
-hidden_layer_sizes = 256
+hidden_layer_sizes = 128
 #
 use_permutation = True
 #
