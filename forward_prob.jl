@@ -67,12 +67,11 @@ function r(x)
 end
 
 function forwardProb(β)
-    α = sqrt(β/π) #The gaussian normalization coefficient
     xarr = -5:0.05:5
     #Plots the l and r functions
     fig = plot(xarr, r.(xarr), label=L"R(d, f, g, t)", lw=2, xlabel="t", ylabel="L, R, G")
     plot!(fig, xarr, l.(xarr), label=L"L(a, b, c, t)", lw=2)
-    gaussian(x) = α*exp(-β*(x - μ)^2)
+    gaussian(x) = sqrt(β/π)*exp(-β*(x - μ)^2)
     #Defines the functions used by Roots.jl to find the intersection points
     l_min(x) = l(x) - gaussian(x)
     r_min(x) = r(x) - gaussian(x)

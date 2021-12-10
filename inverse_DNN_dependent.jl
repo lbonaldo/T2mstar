@@ -38,11 +38,11 @@ model = Chain(
 #traindata = gpu.(read(trainfile)) #Zips the input and output data in the training set together and moves it to a GPU (if availibile and CuArrays is set up correctly)
 #testdata = gpu.(read(testfile))
 #Imports the data
-train_file = "train.out"
-test_file = "test.out"
+train_file = "data/train.out"
+test_file = "data/test.out"
 @load train_file traindata
 @load test_file testdata
-println(traindata[100001])
+println(size(traindata))
 println(typeof(traindata))
 exit()
 #Moves the data to the GPU for more efficient training

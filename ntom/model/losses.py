@@ -29,15 +29,6 @@ def MMD_matrix_multiscale(x, y, widths_exponents):
     return XX + YY - 2.*XY
 
 
-def l2_dist_matrix(x, y):
-    xx, yy, xy = torch.mm(x,x.t()), torch.mm(y,y.t()), torch.mm(x,y.t())
-
-    rx = (xx.diag().unsqueeze(0).expand_as(xx))
-    ry = (yy.diag().unsqueeze(0).expand_as(yy))
-
-    return torch.clamp(rx.t() + ry - 2.*xy, 0, np.inf)
-
-
 def forward_mmd(y0, y1):
     return MMD_matrix_multiscale(y0, y1, c.mmd_forw_kernels)
 
@@ -46,8 +37,9 @@ def backward_mmd(x0, x1):
     return MMD_matrix_multiscale(x0, x1, c.mmd_back_kernels)
 
 
-def l2_fit(input, target):
-    return torch.sum((input - target)**2) / c.batch_size
+def l2_fit(pred, true):
+    torch.nn.functional.mse_loss(pred,true)
+#    return torch.sum((input - target)**2) / c.batch_size
 
 
 def debug_mmd_terms(XX, YY, XY):

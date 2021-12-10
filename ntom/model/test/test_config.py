@@ -30,6 +30,7 @@ ndim_pad_zy = 0
 assert (ndim_x + ndim_pad_x
         == ndim_y + ndim_z + ndim_pad_zy), "Dimensions don't match up"
 
+data_path = "/mnt/scratch/bonal1lCMICH/inverse/ntom/data"
 
 # Both for fitting, and for the reconstruction, perturb y with Gaussian
 # noise of this sigma
@@ -48,13 +49,13 @@ zeros_noise_scale = 1e3
 # Initialize the model parameters from a normal distribution with this sigma
 init_scale = 0.10
 #
-N_blocks   = 6
+N_blocks   = 4
 #
 exponent_clamping = 2.0
 #
-hidden_layer_sizes = 256
+hidden_layer_sizes = 128
 #
-dropout_perc = 0.2
+dropout_perc = 0.0
 #
 batch_norm = True
 #

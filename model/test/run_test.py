@@ -8,7 +8,7 @@ import torch
 import test_config as c
 import model
 
-os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"                                                                                                                                                                      
+os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"                                                                            
 os.environ["CUDA_VISIBLE_DEVICES"]="2"  
 
 def noise_batch(ndim):
@@ -34,7 +34,8 @@ def g(x, beta, mu):
     return np.sqrt(beta/np.pi)*np.exp(-beta*(x - mu)**2)
 
 
-def inference(data_path, model_path):
+# test coeff reconstruction: coeff_pred, _ = model.model(torch.cat(cat_inputs, 1), rev=True)
+def inference(model_path):
     export_path = os.path.join(model_path,"data")
     if not os.path.isdir(export_path):
         os.mkdir(export_path)
@@ -48,16 +49,33 @@ def inference(data_path, model_path):
     model.load(os.path.join(model_path, 'inn.pt'))
 
     # DATASET IMPORT
-    I_test = torch.Tensor(np.load(os.path.join(data_path,'I_test.npy')))
-    coeff_test = torch.Tensor(np.load(os.path.join(data_path,'coeff_test.npy')))
-    
-    idxs = tuple(np.random.randint(0,len(I_test),size=500))
-    I_test = I_test[idxs, None]
-    coeff_test = coeff_test[idxs, :]
+    x_train_ = torch.Tensor(np.load(os.path.join(c.data_path, 'coeff_train.npy')))
+    train_size = x_train_.shape[0]
+    y_train_ = torch.Tensor(np.load(os.path.join(c.data_path, 'I_train.npy')))
+    y_train_ = y_train_[:, None]
+
+    x_val_ = torch.Tensor(np.load(os.path.join(c.data_path, 'coeff_test.npy')))
+    val_size = x_val_.shape[0]
+    y_val_ = torch.Tensor(np.load(os.path.join(c.data_path, 'I_test.npy')))
+    y_val_ = y_val_[:, None]
+
+    x = torch.cat((x_train_, x_val_), dim=0)
+    x_mean = x.mean(dim=0, keepdim=True)
+    x_std = x.std(dim=0, keepdim=True)
+    coeff_test = x_val_
+
+    y = torch.cat((y_train_, y_val_), dim=0)
+    y_mean = y.mean(dim=0, keepdim=True)
+    y_std = y.std(dim=0, keepdim=True)
+    y_norm = (y - y_mean) / y_std
+    I_test = y_norm[train_size:train_size+val_size,:]
+
+#    I_test = torch.Tensor(np.load(os.path.join(c.data_path,'I_test.npy')))
+#    coeff_test = torch.Tensor(np.load(os.path.join(c.data_path,'coeff_test.npy')))
 
     tst_loader = torch.utils.data.DataLoader(
         torch.utils.data.TensorDataset(I_test, coeff_test),
-        batch_size=c.batch_size, shuffle=False, drop_last=True)
+        batch_size=c.batch_size, shuffle=True, drop_last=True)
     
     # INFERENCE
     results = []
@@ -74,10 +92,19 @@ def inference(data_path, model_path):
             results.append((coeff_pred, coeff_true))
             break
     
-    for i in range(10):
-        pred = results[0][0][i, :c.ndim_x].detach().cpu().numpy()
-        true = results[0][1][i,:]
-        np.savetxt(export_path+"/coeff_{}.csv".format(i), np.stack((pred, true)), delimiter=",")
+    for i in range(10,20):
+        true = results[0][1][i,:]        
+        pred_norm = results[0][0][i, :c.ndim_x].detach().cpu()
+        
+        x_mean = torch.squeeze(x_mean)
+        x_std = torch.squeeze(x_std)
+        pred = pred_norm*x_std + x_mean
+        
+        print(true)
+        print(pred_norm)
+        print(pred)
+
+        np.savetxt(export_path+"/coeff_{}.csv".format(i-10), np.stack((pred, true)), delimiter=",")
     return
 
 
@@ -158,8 +185,7 @@ def inference_rev(data_path, model_path):
     return
 
 if __name__ == "__main__":
-    data_path = "/mnt/scratch/bonal1lCMICH/data"
     if len(sys.argv) == 1:
         exit("Export folder name")
     else:
-        output = inference(data_path, sys.argv[1])
+        output = inference(sys.argv[1])

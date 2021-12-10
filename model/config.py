@@ -7,7 +7,7 @@ import torch
 
 
 def create_testfolder():
-    tpath = "/mnt/scratch/bonal1lCMICH/results"
+    tpath = "/mnt/scratch/bonal1lCMICH/inverse/toy/results"
     if not os.path.isdir(tpath): # if there is not a results folder -> create it
         os.mkdir(tpath)
     today_date = date.today().strftime("%b-%d-%Y")
@@ -35,7 +35,7 @@ logfile         = os.path.join(test_path, "out.txt")
 # Filename to save the model under
 filename_out    = os.path.join(test_path, 'inn.pt')
 # Data folder
-data_path       = "/mnt/scratch/bonal1lCMICH/data"
+data_path       = "/mnt/scratch/bonal1lCMICH/inverse/toy/data"
 # Model to load and continue training. Ignored if empty string
 filename_in     = ''
 # Compute device to perform the training on, 'cuda' or 'cpu'
@@ -96,13 +96,13 @@ assert (ndim_x + ndim_pad_x
 train_forward_mmd    = True
 train_backward_mmd   = True
 train_reconstruction = True
-train_max_likelihood = False
+train_max_likelihood = True
 
 lambd_fit_forw       = 0.1
 lambd_mmd_forw       = 1.
 lambd_reconstruct    = 80.
 lambd_mmd_back       = 10.
-lambd_max_likelihood = 5e-4
+lambd_max_likelihood = 1e-3
 
 # Both for fitting, and for the reconstruction, perturb y with Gaussian
 # noise of this sigma
@@ -129,13 +129,13 @@ mmd_back_weighted = True
 # Initialize the model parameters from a normal distribution with this sigma
 init_scale = 0.10
 #
-N_blocks   = 6
+N_blocks   = 5
 #
 exponent_clamping = 2.0
 #
-hidden_layer_sizes = 256
+hidden_layer_sizes = 128
 #
-dropout_perc = 0.2
+dropout_perc = 0.4
 #
 batch_norm = True
 #
