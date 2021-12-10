@@ -21,4 +21,3 @@ tr_loader = torch.utils.data.DataLoader(
 tst_loader = torch.utils.data.DataLoader(
     torch.utils.data.TensorDataset(x_test, y_test),
     batch_size=c.batch_size, shuffle=False, drop_last=True)
-
