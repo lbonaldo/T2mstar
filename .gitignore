@@ -2,6 +2,7 @@ model/to_understand
 *.out
 *.png
 *.pt
+*.npy
 *~
 *npy
 toy/train/job.qsub.*
