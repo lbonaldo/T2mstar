@@ -14,3 +14,14 @@ copy the results in the same test folder locally to create plots with julia
 - scp bonal1lCMICH@hpcc.msu.edu:/mnt/home/bonal1lCMICH/Documents/inverse_problem/inverse/model/test/results/test_11/data/*.csv data/ 
 - if necessary change number of pots "idxs" in the plot_test.jl file
 - julia --project=. model/test/plot_test.jl test_11 
+
+
+New version
+TRAINING
+- edit config.py with appropriate parameters
+- qsub job.qsub
+TEST
+- should be authomatic
+VISUALIZATION
+- julia visualization.jl /mnt/scratch/bonal1lCMICH/inverse/spline/results/Jan-26-2022/16-15-17/test/
+
