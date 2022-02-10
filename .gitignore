@@ -3,6 +3,9 @@ model/to_understand
 *.png
 *.pt
 *.npy
+*.csv
+*.jpg
+*.txt
 *~
 *npy
 toy/train/job.qsub.*
@@ -28,4 +31,6 @@ ntom/train/job.qsub.*
 ntom/test/results
 ntom/test/__pycache__/
 spline/__pycache__/
+spline/Project.toml
 spline_esn/__pycache__/
+spline_esn/Project.toml

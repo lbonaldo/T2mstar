@@ -1,11 +1,10 @@
 # (inverse) inverse> $env:JULIA_NUM_THREADS=4
-# (inverse) inverse> julia --project=.. .\data_gen.jl
+# (inverse) inverse> julia --project=. .\julia_to_py_dataset.jl
 
 using JLD2
 using QuadGK
 using Roots
 using Polynomials
-import Distributions
 
 ######### PARAMS ######### 
 tmin = 0.05
@@ -13,7 +12,7 @@ dt = 0.01
 tmax = 5.0
 polydegree = 9
 
-total_size = 500000
+total_size = 1000000
 traineval_perc = 0.8
 eval_perc = 0.2
 ##########################
@@ -80,37 +79,32 @@ end
 # This function generates a single data "point", consisting of a set of parameters and the corresponding function F(β, params)
 function generateDataPoint(ts::Vector{Float64}, polydegree::Int64)
     # a and c are strictly positive, since they determine the direction of the function.
-    # a,c = rand(Float64, 2)
+    a,c = rand(Float64, 2)
     # b and d can be either positive of negative, since bands are allowed to cross. 
-    # b,d = rand(Float64, 2) .* sign.(randn(Float64, 2))
+    b,d = rand(Float64, 2) .* sign.(randn(Float64, 2))
     # Since the intersection point for both bands is -b/a and d/c, respectively, if a or c are sufficiently small our band positions can be pretty crazy. 
     # This is just a sanity check to makes sure that they aren't, so that μ always lies between -1 and 1. This makes it a bit more ML friendly.
-    # if abs(a) < abs(b)
-    #     bs = sign(b)
-    #     temp = a
-    #     a = abs(b)
-    #     b = bs*temp
-    # end
-    # if abs(c) < abs(d)
-    #     cs = sign(d)
-    #     temp = c
-    #     c = abs(d)
-    #     d = cs*temp
-    # end
-    # # no band crossing for this test
-    # while d/c < -b/a
-    #     tmp, d = d, -b
-    #     b = -tmp
-    #     a, c = c, a
-    # end
+    if abs(a) < abs(b)
+        bs = sign(b)
+        temp = a
+        a = abs(b)
+        b = bs*temp
+    end
+    if abs(c) < abs(d)
+        cs = sign(d)
+        temp = c
+        c = abs(d)
+        d = cs*temp
+    end
+    # no band crossing for this test
+    while d/c < -b/a
+        tmp, d = d, -b
+        b = -tmp
+        a, c = c, a
+    end
     # Increases the chance that μ lies between the bands. The bands hit zero at -b/a and d/c, respectively. μ is selected at a random spot between these two points.
-    # μ_t = rand(Float64)
-    # μ = (1-μ_t)*(-b/a) + μ_t*(d/c)
-    a = 1-rand(Float64)
-    c = 1-rand(Float64)
-    b = (1-rand(Float64))*sign(randn(Float64))
-    d = (1-rand(Float64))*sign(randn(Float64))
-    μ = rand(Distributions.Uniform(-1, 1))
+    μ_t = rand(Float64)
+    μ = (1-μ_t)*(-b/a) + μ_t*(d/c)
     # Calculate I(β, params) by calling forwardProb for each value of β.
     I = map(t -> forwardProb(t, a, b, c, d, μ), ts)
     pol = fit(ts, I, polydegree)
@@ -131,8 +125,8 @@ Threads.@threads for i in 1:train_size # This is the number of points in the tra
     x_train[i,:] = g[1]
     y_train[i,:] = g[2]
 end
-@save "dataset/x_train.out" x_train
-@save "dataset/y_train.out" y_train
+@save "x_train.out" x_train
+@save "y_train.out" y_train
 println("[1/3] Training data created.")
 # VALID DATA
 Threads.@threads for i in 1:eval_size # This is the number of points in the valdiation set
@@ -140,8 +134,8 @@ Threads.@threads for i in 1:eval_size # This is the number of points in the vald
     x_eval[i,:] = g[1]
     y_eval[i,:] = g[2]
 end
-@save "dataset/x_eval.out" x_eval
-@save "dataset/y_eval.out" y_eval
+@save "x_eval.out" x_eval
+@save "y_eval.out" y_eval
 println("[2/3] Validation data created.")
 # TEST DATA
 Threads.@threads for i in 1:test_size # This is the number of points in the test set
@@ -149,8 +143,8 @@ Threads.@threads for i in 1:test_size # This is the number of points in the test
     x_test[i,:] = g[1]
     y_test[i,:] = g[2]
 end
-@save "dataset/x_test.out" x_test
-@save "dataset/y_test.out" y_test
+@save "x_test.out" x_test
+@save "y_test.out" y_test
 println("[3/3] Test data created.")
 gen_time = time_ns() - time
 
