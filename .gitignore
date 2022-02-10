@@ -27,3 +27,5 @@ ntom/train/__pycache__/
 ntom/train/job.qsub.*
 ntom/test/results
 ntom/test/__pycache__/
+spline/__pycache__/
+spline_esn/__pycache__/
