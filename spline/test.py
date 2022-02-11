@@ -86,7 +86,7 @@ if __name__ == '__main__':
     if len(sys.argv) < 2:
         exit("Missing model path. Exit.") 
 
-    if c.device is "cuda":
+    if c.device == "cuda":
         print(torch.cuda.get_device_name(0))        
         c.log(torch.cuda.get_device_name(0), c.logfile)
 

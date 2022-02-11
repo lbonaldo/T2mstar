@@ -1,0 +1,79 @@
+================================================================================
+Config options:
+
+  N_blocks                 	4
+  adam_betas               	(0.9, 0.95)
+  add_pad_noise            	0.0001
+  add_y_noise              	0.01
+  add_z_noise              	0.01
+  batch_norm               	False
+  batch_size               	100
+  data_path                	/mnt/scratch/bonal1lCMICH/inverse/spline_esn/data
+  device                   	cuda
+  dropout_perc             	0.2
+  exponent_clamping        	2.0
+  filename_in              	
+  filename_out             	/mnt/scratch/bonal1lCMICH/inverse/spline_esn/results/Feb-10-2022/15-59-06/inn.pt
+  final_decay              	0.01
+  hidden_layer_sizes       	64
+  init_scale               	0.3
+  interactive_visualization	False
+  l2_weight_reg            	0.05
+  lambd_fit_forw           	0.001
+  lambd_max_likelihood     	0.001
+  lambd_mmd_back           	10.0
+  lambd_mmd_forw           	1.0
+  lambd_reconstruct        	1.0
+  logfile                  	/mnt/scratch/bonal1lCMICH/inverse/spline_esn/results/Feb-10-2022/15-59-06/out.txt
+  lr_init                  	0.001
+  mmd_back_kernels         	[(1, 0.1), (1, 0.5), (1, 2)]
+  mmd_back_weighted        	True
+  mmd_forw_kernels         	[(1, 2), (1, 2), (1, 2)]
+  n_epochs                 	60
+  n_its_per_epoch          	5000
+  ndim_pad_x               	6
+  ndim_pad_zy              	0
+  ndim_x                   	6
+  ndim_y                   	9
+  ndim_z                   	3
+  pre_low_lr               	5
+  test_path                	/mnt/scratch/bonal1lCMICH/inverse/spline_esn/results/Feb-10-2022/15-59-06
+  test_time_functions      	[]
+  train_backward_mmd       	True
+  train_forward_mmd        	True
+  train_max_likelihood     	False
+  train_reconstruction     	True
+  use_cuda                 	True
+  use_permutation          	False
+  verbose_construction     	False
+  y_uncertainty_sigma      	0.1
+  zeros_noise_scale        	100
+================================================================================
+
+Best loss:  inf
+New loss:  0.37499467401792197
+Model saved.
+Epoch            L_fit       L_mmd_fwd    L_mmd_back_e    L_mmd_back_s    L_mmd_back_n     L_reconst_e     L_reconst_s     L_reconst_n      L_fit(val)  L_mmd_fwd(val) L_mmd_back_e(val) L_mmd_back_s(val) L_mmd_back_n(val) L_reconst_e(val) L_reconst_s(val) L_reconst_n(val)
+                                                                                    000     305300.9144          0.4135          0.5731          0.5709          0.5711  77237110607806960929460977664.0000  82849579452585855738494058496.0000  73597737216146598152625979392.0000          0.0012          0.5635          0.5604          0.5565          0.5574          0.1273          0.4349          0.1255
+Best loss:  0.37499467401792197
+New loss:  0.3749891783585307
+Model saved.
+                                                                                    001          0.0012          0.5646          0.5604          0.5565          0.5574          0.1274          0.4366          0.1276          0.0012          0.5634          0.5604          0.5564          0.5574          0.1273          0.4349          0.1255
+                                                                                    002          0.0012          0.5648          0.5604          0.5565          0.5574          0.1274          0.4366          0.1276          0.0012          0.5639          0.5604          0.5566          0.5575          0.1273          0.4350          0.1255
+                                                                                    003          0.0012          0.5645          0.5604          0.5565          0.5574          0.1274          0.4367          0.1276          0.0012          0.5635          0.5604          0.5565          0.5575          0.1273          0.4349          0.1255
+                                                                                    004          0.0012          0.5648          0.5604          0.5565          0.5574          0.1274          0.4367          0.1276          0.0012          0.5634          0.5604          0.5565          0.5574          0.1273          0.4350          0.1255
+Best loss:  0.3749891783585307
+New loss:  0.37491677871920753
+Model saved.
+                                                                                    005          0.0012          0.5647          0.5603          0.5565          0.5574          0.1274          0.4367          0.1276          0.0012          0.5632          0.5603          0.5565          0.5574          0.1273          0.4350          0.1255
+                                                                                    006          0.0012          0.5647          0.5604          0.5565          0.5574          0.1274          0.4366          0.1276          0.0012          0.5633          0.5604          0.5565          0.5574          0.1273          0.4350          0.1255
+                                                                                    007          0.0012          0.5649          0.5604          0.5565          0.5574          0.1274          0.4367          0.1276          0.0012          0.5632          0.5604          0.5565          0.5574          0.1273          0.4350          0.1255
+                                                                                    008          0.0012          0.5644          0.5604          0.5565          0.5574          0.1274          0.4367          0.1276          0.0012          0.5632          0.5604          0.5565          0.5575          0.1273          0.4349          0.1255
+Best loss:  0.37491677871920753
+New loss:  0.37484038836467987
+Model saved.
+                                                                                    009          0.0012          0.5646          0.5603          0.5565          0.5574          0.1274          0.4367          0.1276          0.0012          0.5629          0.5604          0.5563          0.5574          0.1273          0.4349          0.1255
+                                                                                    010          0.0012          0.5649          0.5603          0.5565          0.5574          0.1274          0.4366          0.1276          0.0012          0.5633          0.5604          0.5564          0.5575          0.1273          0.4349          0.1255
+                                                                                    011          0.0012          0.5645          0.5604          0.5565          0.5574          0.1274          0.4367          0.1276          0.0012          0.5630          0.5604          0.5564          0.5574          0.1273          0.4349          0.1255
+                                                                                    012          0.0012          0.5648          0.5604          0.5565          0.5574          0.1274          0.4366          0.1276          0.0012          0.5635          0.5604          0.5565          0.5574          0.1273          0.4350          0.1255
+                                                                                    013          0.0012          0.5649          0.5604          0.5565          0.5574          0.1274          0.4367          0.1276          0.0012          0.5633          0.5604          0.5564          0.5574          0.1273          0.4350          0.1255

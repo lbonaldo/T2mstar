@@ -85,13 +85,13 @@ def restart():
     loss_labels = []
 
     if c.train_max_likelihood:
-        loss_labels.extend(['L_ML_e','L_ML_s','L_ML_n'])
+        loss_labels.append('L_ML')
     if c.train_forward_mmd:
         loss_labels += ['L_fit', 'L_mmd_fwd']
     if c.train_backward_mmd:
-        loss_labels.extend(['L_mmd_back_e','L_mmd_back_s','L_mmd_back_n'])
+        loss_labels.append('L_mmd_back')
     if c.train_reconstruction:
-        loss_labels.extend(['L_reconst_e','L_reconst_s','L_reconst_n'])
+        loss_labels.append('L_reconst')
 
     loss_labels += [l + '(val)' for l in loss_labels]
 

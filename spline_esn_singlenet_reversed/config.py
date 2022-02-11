@@ -6,7 +6,7 @@ from datetime import date, datetime
 import torch
 
 def create_testfolder():
-    tpath = "/mnt/scratch/bonal1lCMICH/inverse/spline_esn/results"
+    tpath = "/mnt/scratch/bonal1lCMICH/inverse/spline_esn_singlenet_reversed/results"
     if not os.path.isdir(tpath): # if there is not a results folder -> create it
         os.mkdir(tpath)
     today_date = date.today().strftime("%b-%d-%Y")
@@ -34,7 +34,7 @@ logfile         = os.path.join(test_path, "out.txt")
 # Filename to save the model under
 filename_out    = os.path.join(test_path, 'inn.pt')
 # Data folder
-data_path       = "/mnt/scratch/bonal1lCMICH/inverse/spline_esn/data"
+data_path       = "/mnt/scratch/bonal1lCMICH/inverse/spline_esn_singlenet_reversed/data"
 # Model to load and continue training. Ignored if empty string
 filename_in     = ''
 # Compute device to perform the training on, 'cuda' or 'cpu'
@@ -72,11 +72,11 @@ adam_betas = (0.9, 0.95)
 #  Data dimensions  #
 #####################
 
-ndim_x     = 6  # polynomial of degree 5
-ndim_pad_x = 6
+ndim_x     = 9  
+ndim_pad_x = 13
 
-ndim_y     = 9  # 9 coefficient
-ndim_z     = 3
+ndim_y     = 18 
+ndim_z     = 4
 ndim_pad_zy = 0
 
 assert (ndim_x + ndim_pad_x
@@ -91,7 +91,7 @@ from dataloader import train_loader, val_loader
 train_forward_mmd    = True
 train_backward_mmd   = True
 train_reconstruction = True
-train_max_likelihood = False
+train_max_likelihood = True
 
 lambd_fit_forw       = 1e-3
 lambd_mmd_forw       = 1.
@@ -124,11 +124,11 @@ mmd_back_weighted = True
 # Initialize the model parameters from a normal distribution with this sigma
 init_scale = 0.30
 #
-N_blocks   = 4
+N_blocks   = 6
 #
 exponent_clamping = 2.0
 #
-hidden_layer_sizes = 64
+hidden_layer_sizes = 128
 #
 dropout_perc = 0.2
 #

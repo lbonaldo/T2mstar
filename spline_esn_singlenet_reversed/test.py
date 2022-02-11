@@ -25,9 +25,8 @@ def inference(model_path):
         os.mkdir(export_path)
 
     # MODEL INITIALIZATION
-    model.model_e.eval()
-    model.model_s.eval()
-    model.model_n.eval()
+    model.model.eval()
+
     #model.load("/mnt/scratch/bonal1lCMICH/inverse/spline/results/Jan-14-2022/06-51-44/inn.pt")
     model.load(os.path.join(model_path, 'inn.pt'))
 
@@ -68,20 +67,19 @@ def inference(model_path):
         for (x_e, x_s, x_n, y) in test_loader:
 
             x_e, x_s, x_n, y = Variable(x_e).to(c.device), Variable(x_s).to(c.device), Variable(x_n).to(c.device), Variable(y).to(c.device) 
-            if c.ndim_pad_x:
-                x_e = torch.cat((x_e, c.add_pad_noise * noise_batch(c.ndim_pad_x)), dim=1)
-                x_s = torch.cat((x_s, c.add_pad_noise * noise_batch(c.ndim_pad_x)), dim=1)
-                x_n = torch.cat((x_n, c.add_pad_noise * noise_batch(c.ndim_pad_x)), dim=1)
-            if c.add_y_noise > 0:
-                y += c.add_y_noise * noise_batch(c.ndim_y)
-            if c.ndim_pad_zy:
-                y = torch.cat((c.add_pad_noise * noise_batch(c.ndim_pad_zy), y), dim=1)
-            y = torch.cat((noise_batch(c.ndim_z), y), dim=1)
 
-            out_y_e,_ = model.model_e(x_e)
-            out_y_s,_ = model.model_s(x_s)
-            out_y_n,_ = model.model_n(x_n)
-            pred_y_batch = (out_y_e+out_y_s+out_y_n)/3
+            x = torch.cat((x_e, x_s, x_n), dim=1)
+
+            if c.ndim_pad_x:
+                x = torch.cat((x, c.add_pad_noise * noise_batch(c.ndim_pad_x)), dim=1)
+            # if c.add_y_noise > 0:
+            #     y += c.add_y_noise * noise_batch(c.ndim_y)
+            # if c.ndim_pad_zy:
+            #     y = torch.cat((c.add_pad_noise * noise_batch(c.ndim_pad_zy), y), dim=1)
+            # y = torch.cat((noise_batch(c.ndim_z), y), dim=1)
+
+            # forward step
+            pred_y_batch, _ = model.model(x)
             batch_loss.append(torch.nn.functional.mse_loss(pred_y_batch[:, -c.ndim_y:], y[:, -c.ndim_y:]).detach().cpu().numpy())
             final_coeff_norm[batch_idx*c.batch_size:(batch_idx+1)*c.batch_size, :] = pred_y_batch[:, -c.ndim_y:]
             batch_idx += 1

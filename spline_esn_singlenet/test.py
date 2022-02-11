@@ -25,70 +25,72 @@ def inference(model_path):
         os.mkdir(export_path)
 
     # MODEL INITIALIZATION
-    model.model_e.eval()
-    model.model_s.eval()
-    model.model_n.eval()
+    model.model.eval()
+
     #model.load("/mnt/scratch/bonal1lCMICH/inverse/spline/results/Jan-14-2022/06-51-44/inn.pt")
     model.load(os.path.join(model_path, 'inn.pt'))
 
     # DATASET IMPORT
-    x_test_e = torch.Tensor(np.load(os.path.join(c.data_path, 'x_sigma_test.npy')))
-    x_sigma_mean = torch.load('x_sigma_mean.pt')
-    x_sigma_std = torch.load('x_sigma_std.pt')
-    x_test_norm_e = (x_test_e - x_sigma_mean) / x_sigma_std
+    y_test_e = torch.Tensor(np.load(os.path.join(c.data_path, 'y_sigma_test.npy')))
+    y_sigma_mean = torch.load('y_sigma_mean.pt')
+    y_sigma_std = torch.load('y_sigma_std.pt')
+    y_test_norm_e = (y_test_e - y_sigma_mean) / y_sigma_std
 
-    x_test_s = torch.Tensor(np.load(os.path.join(c.data_path, 'x_seebeck_test.npy')))
-    x_seebeck_mean = torch.load('x_seebeck_mean.pt')
-    x_seebeck_std = torch.load('x_seebeck_std.pt')
-    x_test_norm_s = (x_test_s - x_seebeck_mean) / x_seebeck_std
+    y_test_s = torch.Tensor(np.load(os.path.join(c.data_path, 'y_seebeck_test.npy')))
+    y_seebeck_mean = torch.load('y_seebeck_mean.pt')
+    y_seebeck_std = torch.load('y_seebeck_std.pt')
+    y_test_norm_s = (y_test_s - y_seebeck_mean) / y_seebeck_std
 
-    x_test_n = torch.Tensor(np.load(os.path.join(c.data_path, 'x_n_test.npy')))
-    x_n_mean = torch.load('x_n_mean.pt')
-    x_n_std = torch.load('x_n_std.pt')
-    x_test_norm_n = (x_test_n - x_n_mean) / x_n_std
+    y_test_n = torch.Tensor(np.load(os.path.join(c.data_path, 'y_n_test.npy')))
+    y_n_mean = torch.load('y_n_mean.pt')
+    y_n_std = torch.load('y_n_std.pt')
+    y_test_norm_n = (y_test_n - y_n_mean) / y_n_std
 
-    y_test = torch.Tensor(np.load(os.path.join(c.data_path, 'y_test.npy')))
-    y_mean = torch.load('y_mean.pt')
-    y_std = torch.load('y_std.pt')
-    y_test_norm = (y_test - y_mean) / y_std
+    x_test = torch.Tensor(np.load(os.path.join(c.data_path, 'x_test.npy')))
+    x_mean = torch.load('x_mean.pt')
+    x_std = torch.load('x_std.pt')
+    x_test_norm = (x_test - x_mean) / x_std
 
-    test_size = x_test_e.shape[0]
+    test_size = y_test_e.shape[0]
     print("Test dataset size: ", test_size)
 
     test_loader = torch.utils.data.DataLoader(
-        torch.utils.data.TensorDataset(x_test_norm_e, x_test_norm_s, x_test_norm_n, y_test_norm),
+        torch.utils.data.TensorDataset(x_test_norm, y_test_norm_e, y_test_norm_s, y_test_norm_n),
         batch_size=c.batch_size, shuffle=False, drop_last=True)
     
     # INFERENCE
     batch_idx = 0
     batch_loss = []
     batch_num = int(np.floor(test_size / c.batch_size)) # drop last, see TensorDataset
-    final_coeff_norm = torch.empty((batch_num*c.batch_size, y_test.shape[1]))
+    final_coeff_norm = torch.empty((batch_num*c.batch_size, x_test.shape[1]))
     with torch.set_grad_enabled(False):
-        for (x_e, x_s, x_n, y) in test_loader:
+        for (x, y_e, y_s, y_n) in test_loader:
 
-            x_e, x_s, x_n, y = Variable(x_e).to(c.device), Variable(x_s).to(c.device), Variable(x_n).to(c.device), Variable(y).to(c.device) 
+            x, y_e, y_s, y_n = Variable(x).to(c.device), Variable(y_e).to(c.device), Variable(y_s).to(c.device), Variable(y_n).to(c.device) 
+
+            y = torch.cat((y_e, y_s, y_n), dim=1)
+
             if c.ndim_pad_x:
-                x_e = torch.cat((x_e, c.add_pad_noise * noise_batch(c.ndim_pad_x)), dim=1)
-                x_s = torch.cat((x_s, c.add_pad_noise * noise_batch(c.ndim_pad_x)), dim=1)
-                x_n = torch.cat((x_n, c.add_pad_noise * noise_batch(c.ndim_pad_x)), dim=1)
-            if c.add_y_noise > 0:
-                y += c.add_y_noise * noise_batch(c.ndim_y)
-            if c.ndim_pad_zy:
-                y = torch.cat((c.add_pad_noise * noise_batch(c.ndim_pad_zy), y), dim=1)
-            y = torch.cat((noise_batch(c.ndim_z), y), dim=1)
+                x = torch.cat((x, c.add_pad_noise * noise_batch(c.ndim_pad_x)), dim=1)
+            # if c.add_y_noise > 0:
+            #     y += c.add_y_noise * noise_batch(c.ndim_y)
+            # if c.ndim_pad_zy:
+            #     y = torch.cat((c.add_pad_noise * noise_batch(c.ndim_pad_zy), y), dim=1)
+            # y = torch.cat((noise_batch(c.ndim_z), y), dim=1)
 
-            out_y_e,_ = model.model_e(x_e)
-            out_y_s,_ = model.model_s(x_s)
-            out_y_n,_ = model.model_n(x_n)
-            pred_y_batch = (out_y_e+out_y_s+out_y_n)/3
+            # forward step
+            pred_y_batch, _ = model.model(x)
             batch_loss.append(torch.nn.functional.mse_loss(pred_y_batch[:, -c.ndim_y:], y[:, -c.ndim_y:]).detach().cpu().numpy())
             final_coeff_norm[batch_idx*c.batch_size:(batch_idx+1)*c.batch_size, :] = pred_y_batch[:, -c.ndim_y:]
             batch_idx += 1
     
-    y_pred = (final_coeff_norm.detach().cpu()*y_std + y_mean).numpy()
+
+    y_pred_e = (final_coeff_norm[:,:6].detach().cpu()*y_sigma_std + y_sigma_mean).numpy()
+    y_pred_s = (final_coeff_norm[:,6:12].detach().cpu()*y_seebeck_std + y_seebeck_mean).numpy()
+    y_pred_n = (final_coeff_norm[:,12:].detach().cpu()*y_n_std + y_n_mean).numpy()
+    y_pred = np.column_stack([y_pred_e, y_pred_s, y_pred_n])
     np.savetxt(os.path.join(export_path, "y_pred.txt"), y_pred, delimiter=',')
-    y_true = y_test[:y_pred.shape[0],:]
+    y_true = np.column_stack([y_test_e[:y_pred.shape[0],:], y_test_s[:y_pred.shape[0],:], y_test_n[:y_pred.shape[0],:]]) 
     res = np.column_stack([y_true, y_pred, y_true-y_pred])
     np.savetxt(os.path.join(export_path, "y_results.txt"), res, delimiter=',')
 

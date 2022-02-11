@@ -34,3 +34,4 @@ spline/__pycache__/
 spline/Project.toml
 spline_esn/__pycache__/
 spline_esn/Project.toml
+spline_esn_singlenet/__pycache__/

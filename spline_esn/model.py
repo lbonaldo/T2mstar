@@ -74,13 +74,13 @@ def save(name):
 
 def load(name):
     state_dicts = torch.load(name, map_location=torch.device(c.device))
-    model_e.load_state_dict(state_dicts['net_e'])
-    model_s.load_state_dict(state_dicts['net_s'])
-    model_n.load_state_dict(state_dicts['net_n'])
+    model_e.load_state_dict(state_dicts[0]['net_e'])
+    model_s.load_state_dict(state_dicts[1]['net_s'])
+    model_n.load_state_dict(state_dicts[2]['net_n'])
     try:
-        optim_e.load_state_dict(state_dicts['opt_e'])
-        optim_s.load_state_dict(state_dicts['opt_s'])
-        optim_n.load_state_dict(state_dicts['opt_n'])
+        optim_e.load_state_dict(state_dicts[0]['opt_e'])
+        optim_s.load_state_dict(state_dicts[1]['opt_s'])
+        optim_n.load_state_dict(state_dicts[2]['opt_n'])
     except ValueError:
         c.log('Cannot load optimizer for some reason or other', c.logfile)
         print('Cannot load optimizer for some reason or other')

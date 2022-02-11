@@ -32,18 +32,14 @@ def run_train():
         for i_epoch in range(-c.pre_low_lr, c.n_epochs):
 
             if i_epoch < 0:
-                for param_group in model.optim_e.param_groups:
-                    param_group['lr'] = c.lr_init * 1e-1
-                for param_group in model.optim_s.param_groups:
-                    param_group['lr'] = c.lr_init * 1e-1
-                for param_group in model.optim_n.param_groups:
+                for param_group in model.optim.param_groups:
                     param_group['lr'] = c.lr_init * 1e-1
 
             epoch_train_losses = train.train_epoch()
             epoch_val_losses  = train.train_epoch(eval=True)
 
-            val_loss_cum = (epoch_val_losses[0]+epoch_val_losses[1]+epoch_val_losses[2])/3
-            if  val_loss_cum< running_loss:
+            val_loss_cum = epoch_val_losses[0]
+            if  val_loss_cum < running_loss:
                 print("Best loss: ", running_loss)
                 print("New loss: ", val_loss_cum)
                 model.save(c.filename_out)
