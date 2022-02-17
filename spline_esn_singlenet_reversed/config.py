@@ -51,7 +51,7 @@ test_time_functions = []
 #######################
 
 # Initial learning rate
-lr_init         = 1e-3
+lr_init         = 1e-2
 #Batch size
 batch_size      = 100
 # Total number of epochs to train for
@@ -60,7 +60,7 @@ n_epochs        = 60
 n_its_per_epoch = 5000
 # For the first n epochs, train with a lower learning rate (lr_init*0.1). This can be
 # helpful if the model immediately explodes.
-pre_low_lr      = 5
+pre_low_lr      = 2
 # Decay exponentially each epoch, to final_decay*lr_init at the last epoch.
 final_decay     = 0.01
 # L2 weight regularization of model parameters
@@ -122,9 +122,9 @@ mmd_back_weighted = True
 ###########
 
 # Initialize the model parameters from a normal distribution with this sigma
-init_scale = 0.30
+init_scale = 0.20
 #
-N_blocks   = 6
+N_blocks   = 4
 #
 exponent_clamping = 2.0
 #
@@ -134,6 +134,6 @@ dropout_perc = 0.2
 #
 batch_norm = False
 #
-use_permutation = False
+use_permutation = True
 #
 verbose_construction = False

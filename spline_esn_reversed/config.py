@@ -6,7 +6,7 @@ from datetime import date, datetime
 import torch
 
 def create_testfolder():
-    tpath = "/mnt/scratch/bonal1lCMICH/inverse/spline_esn_singlenet/results"
+    tpath = "/mnt/scratch/bonal1lCMICH/inverse/spline_esn_reversed/results"
     if not os.path.isdir(tpath): # if there is not a results folder -> create it
         os.mkdir(tpath)
     today_date = date.today().strftime("%b-%d-%Y")
@@ -34,7 +34,7 @@ logfile         = os.path.join(test_path, "out.txt")
 # Filename to save the model under
 filename_out    = os.path.join(test_path, 'inn.pt')
 # Data folder
-data_path       = "/mnt/scratch/bonal1lCMICH/inverse/spline_esn_singlenet/data"
+data_path       = "/mnt/scratch/bonal1lCMICH/inverse/spline_esn_reversed/data"
 # Model to load and continue training. Ignored if empty string
 filename_in     = ''
 # Compute device to perform the training on, 'cuda' or 'cpu'
@@ -51,7 +51,7 @@ test_time_functions = []
 #######################
 
 # Initial learning rate
-lr_init         = 1e-3
+lr_init         = 1e-2
 #Batch size
 batch_size      = 100
 # Total number of epochs to train for
@@ -60,7 +60,7 @@ n_epochs        = 60
 n_its_per_epoch = 5000
 # For the first n epochs, train with a lower learning rate (lr_init*0.1). This can be
 # helpful if the model immediately explodes.
-pre_low_lr      = 5
+pre_low_lr      = 2
 # Decay exponentially each epoch, to final_decay*lr_init at the last epoch.
 final_decay     = 0.01
 # L2 weight regularization of model parameters
@@ -72,11 +72,11 @@ adam_betas = (0.9, 0.95)
 #  Data dimensions  #
 #####################
 
-ndim_x     = 18  # polynomial of degree 5
+ndim_x     = 9  # nine parameters for band structure
 ndim_pad_x = 0
 
-ndim_y     = 9  # 9 coefficient
-ndim_z     = 9
+ndim_y     = 6 # esn with a polyfit of degree 5
+ndim_z     = 3
 ndim_pad_zy = 0
 
 assert (ndim_x + ndim_pad_x
@@ -122,7 +122,7 @@ mmd_back_weighted = True
 ###########
 
 # Initialize the model parameters from a normal distribution with this sigma
-init_scale = 0.15
+init_scale = 0.20
 #
 N_blocks   = 6
 #
@@ -134,6 +134,6 @@ dropout_perc = 0.2
 #
 batch_norm = False
 #
-use_permutation = False
+use_permutation = True
 #
 verbose_construction = False

@@ -72,7 +72,7 @@ def train_epoch(eval=False):
             batch_losses = []
             batch_idx += 1
 
-            x, y_e, y_s, y_n = Variable(x).to(c.device), Variable(y_e).to(c.device), Variable(y_s).to(c.device), Variable(y_n).to(c.device) 
+            x, y_e, y_s, y_n = x.to(c.device), y_e.to(c.device), y_s.to(c.device), y_n.to(c.device) 
 
             y = torch.cat((y_e, y_s, y_n), dim=1)
 
@@ -119,7 +119,7 @@ def train_epoch(eval=False):
         return np.mean(loss_history, axis=0)
 
     else:
-        model.model.eval()
+        model.model.train()
 
         with torch.no_grad():
 
@@ -133,7 +133,7 @@ def train_epoch(eval=False):
                 batch_losses = []
                 batch_idx += 1
 
-                x, y_e, y_s, y_n = Variable(x).to(c.device), Variable(y_e).to(c.device), Variable(y_s).to(c.device), Variable(y_n).to(c.device) 
+                x, y_e, y_s, y_n = x.to(c.device), y_e.to(c.device), y_s.to(c.device), y_n.to(c.device) 
 
                 y = torch.cat((y_e, y_s, y_n), dim=1)
 

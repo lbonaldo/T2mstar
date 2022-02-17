@@ -20,7 +20,6 @@ def loss_max_likelihood(out, jac, y):
                      + 0.5 / c.zeros_noise_scale**2   * torch.sum((out[:, c.ndim_z:-c.ndim_y] - y[:, c.ndim_z:-c.ndim_y])**2, 1)
                      + 0.5 * torch.sum(out[:, :c.ndim_z]**2, 1)
                      - jac)
-
     return c.lambd_max_likelihood * torch.mean(neg_log_likeli)
 
 
@@ -72,8 +71,7 @@ def train_epoch(eval=False):
             batch_losses = []
             batch_idx += 1
 
-            x_e, x_s, x_n, y = Variable(x_e).to(c.device), Variable(x_s).to(c.device), Variable(x_n).to(c.device), Variable(y).to(c.device) 
-
+            x_e, x_s, x_n, y = x_e.to(c.device), x_s.to(c.device), x_n.to(c.device), y.to(c.device)
             x = torch.cat((x_e, x_s, x_n), dim=1)
 
             if c.ndim_pad_x:
@@ -87,22 +85,16 @@ def train_epoch(eval=False):
             # forward step
             out_y, jac = model.model(x)
 
-            print(out_y)
-
             l_forw = 0.0
             if c.train_max_likelihood:
                 lml = loss_max_likelihood(out_y, jac, y)
                 batch_losses.append(lml)
                 l_forw += lml
 
-            print(l_forw)
-
             if c.train_forward_mmd:
                 l_mmd_f = loss_forward_mmd(out_y, y)
                 batch_losses.extend(l_mmd_f)
                 l_forw += sum(l_mmd_f)
-
-            print(l_forw)
 
             l_forw.backward(retain_graph=True)
 
@@ -112,8 +104,6 @@ def train_epoch(eval=False):
                 batch_losses.append(l_mmd_b)
                 l_back += l_mmd_b
 
-            print(l_back)
-
             if c.train_reconstruction:
                 l_rec = loss_reconstruction(out_y.data, x)
                 batch_losses.append(l_rec)
@@ -121,15 +111,13 @@ def train_epoch(eval=False):
 
             loss_history.append([l.item() for l in batch_losses])
 
-            print(l_back)
-
             l_back.backward()
             model.optim_step()
 
         return np.mean(loss_history, axis=0)
 
     else:
-        model.model.eval()
+        model.model.train()
 
         with torch.no_grad():
 
@@ -143,7 +131,7 @@ def train_epoch(eval=False):
                 batch_losses = []
                 batch_idx += 1
 
-                x_e, x_s, x_n, y = Variable(x_e).to(c.device), Variable(x_s).to(c.device), Variable(x_n).to(c.device), Variable(y).to(c.device)
+                x_e, x_s, x_n, y = x_e.to(c.device), x_s.to(c.device), x_n.to(c.device), y.to(c.device)
 
                 x = torch.cat((x_e, x_s, x_n), dim=1)
 

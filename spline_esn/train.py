@@ -74,7 +74,7 @@ def train_epoch(eval=False):
             batch_losses = []
             batch_idx += 1
 
-            x_e, x_s, x_n, y = Variable(x_e).to(c.device), Variable(x_s).to(c.device), Variable(x_n).to(c.device), Variable(y).to(c.device) 
+            x_e, x_s, x_n, y = x_e.to(c.device), x_s.to(c.device), x_n.to(c.device), y.to(c.device) 
 
             if c.ndim_pad_x:
                 x_e = torch.cat((x_e, c.add_pad_noise * noise_batch(c.ndim_pad_x)), dim=1)
@@ -92,18 +92,13 @@ def train_epoch(eval=False):
             out_y_n, jac_n = model.model_n(x_n)
             out_y = (out_y_e+out_y_s+out_y_n)/3
 
-            #print(out_y)
-
             l_forw_e = 0.0
             l_forw_s = 0.0
             l_forw_n = 0.0
             if c.train_max_likelihood:
                 lml_e = loss_max_likelihood(out_y, jac_e, y)
-                #print(lml_e)
                 lml_s = loss_max_likelihood(out_y, jac_s, y)
-                #print(lml_s)
                 lml_n = loss_max_likelihood(out_y, jac_n, y)
-                #print(lml_n)
                 batch_losses.extend([lml_e,lml_s,lml_n])
                 l_forw_e += lml_e
                 l_forw_s += lml_s
@@ -111,7 +106,6 @@ def train_epoch(eval=False):
 
             if c.train_forward_mmd:
                 l_mmd_f = loss_forward_mmd(out_y, y)
-                #print(l_mmd_f)
                 batch_losses.extend(l_mmd_f)
                 l_forw_e += sum(l_mmd_f)
                 l_forw_s += sum(l_mmd_f)
@@ -126,11 +120,8 @@ def train_epoch(eval=False):
             l_back_n = 0.0
             if c.train_backward_mmd:
                 l_mmd_b_e = loss_backward_mmd(x_e, y, model.model_e)
-                #print(l_mmd_b_e)
                 l_mmd_b_s = loss_backward_mmd(x_s, y, model.model_s)
-                #print(l_mmd_b_s)
                 l_mmd_b_n = loss_backward_mmd(x_n, y, model.model_n)
-                #print(l_mmd_b_n)
                 batch_losses.extend([l_mmd_b_e,l_mmd_b_s,l_mmd_b_n])
                 l_back_e += l_mmd_b_e
                 l_back_s += l_mmd_b_s
@@ -138,11 +129,8 @@ def train_epoch(eval=False):
 
             if c.train_reconstruction:
                 l_rec_e = loss_reconstruction(out_y.data, x_e, model.model_e)
-                #print(l_rec_e)
                 l_rec_s = loss_reconstruction(out_y.data, x_s, model.model_s)
-                #print(l_rec_s)
                 l_rec_n = loss_reconstruction(out_y.data, x_n, model.model_n)
-                #print(l_rec_n)
                 batch_losses.extend([l_rec_e,l_rec_s,l_rec_n])
                 l_back_e += l_rec_e
                 l_back_s += l_rec_s
@@ -174,7 +162,7 @@ def train_epoch(eval=False):
                 batch_losses = []
                 batch_idx += 1
 
-                x_e, x_s, x_n, y = Variable(x_e).to(c.device), Variable(x_s).to(c.device), Variable(x_n).to(c.device), Variable(y).to(c.device) 
+                x_e, x_s, x_n, y = x_e.to(c.device), x_s.to(c.device), x_n.to(c.device), y.to(c.device) 
 
                 if c.ndim_pad_x:
                     x_e = torch.cat((x_e, c.add_pad_noise * noise_batch(c.ndim_pad_x)), dim=1)
@@ -216,12 +204,5 @@ def train_epoch(eval=False):
 
                 loss_history.append([l.item() for l in batch_losses])
 
-            #monitoring.show_hist(out_y[:, :c.ndim_z])
-            #monitoring.show_cov(out_y[:, :c.ndim_z])
-
-            # if c.test_time_functions:
-            #     out_x, jac = model.model(y, rev=True)
-            #     for f in c.test_time_functions:
-            #         f(out_x, out_y, x, y)
 
             return np.mean(loss_history, axis=0)

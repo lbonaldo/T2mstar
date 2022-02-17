@@ -1,6 +1,7 @@
 import os
 import sys
 from time import time
+from tkinter import X
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -63,34 +64,39 @@ def inference(model_path):
     batch_idx = 0
     batch_loss = []
     batch_num = int(np.floor(test_size / c.batch_size)) # drop last, see TensorDataset
-    final_coeff_norm = torch.empty((batch_num*c.batch_size, y_test.shape[1]))
+    final_coeff_norm = torch.empty((batch_num*c.batch_size, c.ndim_x*3))
     with torch.set_grad_enabled(False):
         for (x_e, x_s, x_n, y) in test_loader:
 
             x_e, x_s, x_n, y = Variable(x_e).to(c.device), Variable(x_s).to(c.device), Variable(x_n).to(c.device), Variable(y).to(c.device) 
+            x = torch.cat((x_e, x_s, x_n), dim=1)
+
             if c.ndim_pad_x:
-                x_e = torch.cat((x_e, c.add_pad_noise * noise_batch(c.ndim_pad_x)), dim=1)
-                x_s = torch.cat((x_s, c.add_pad_noise * noise_batch(c.ndim_pad_x)), dim=1)
-                x_n = torch.cat((x_n, c.add_pad_noise * noise_batch(c.ndim_pad_x)), dim=1)
+                x = torch.cat((x, c.add_pad_noise * noise_batch(c.ndim_pad_x)), dim=1)
             if c.add_y_noise > 0:
                 y += c.add_y_noise * noise_batch(c.ndim_y)
             if c.ndim_pad_zy:
                 y = torch.cat((c.add_pad_noise * noise_batch(c.ndim_pad_zy), y), dim=1)
             y = torch.cat((noise_batch(c.ndim_z), y), dim=1)
 
-            out_y_e,_ = model.model_e(x_e)
-            out_y_s,_ = model.model_s(x_s)
-            out_y_n,_ = model.model_n(x_n)
-            pred_y_batch = (out_y_e+out_y_s+out_y_n)/3
-            batch_loss.append(torch.nn.functional.mse_loss(pred_y_batch[:, -c.ndim_y:], y[:, -c.ndim_y:]).detach().cpu().numpy())
-            final_coeff_norm[batch_idx*c.batch_size:(batch_idx+1)*c.batch_size, :] = pred_y_batch[:, -c.ndim_y:]
+            pred_x_e_batch,_ = model.model_e(y, rev=True)
+            pred_x_s_batch,_ = model.model_s(y, rev=True)
+            pred_x_n_batch,_ = model.model_n(y, rev=True)
+            loss_x_e = torch.nn.functional.mse_loss(pred_x_e_batch[:, :c.ndim_x], x[:, :c.ndim_x]).detach().cpu().numpy()
+            loss_x_s = torch.nn.functional.mse_loss(pred_x_s_batch[:, :c.ndim_x], x[:, :c.ndim_x]).detach().cpu().numpy()
+            loss_x_n = torch.nn.functional.mse_loss(pred_x_n_batch[:, :c.ndim_x], x[:, :c.ndim_x]).detach().cpu().numpy()
+            batch_loss.append((loss_x_e+loss_x_s+loss_x_n)/3)
+            final_coeff_norm[batch_idx*c.batch_size:(batch_idx+1)*c.batch_size, :] = torch.cat((pred_x_e_batch[:,:c.ndim_x], pred_x_s_batch[:,:c.ndim_x], pred_x_n_batch[:,:c.ndim_x]), dim=1)
             batch_idx += 1
     
-    y_pred = (final_coeff_norm.detach().cpu()*y_std + y_mean).numpy()
-    np.savetxt(os.path.join(export_path, "y_pred.txt"), y_pred, delimiter=',')
-    y_true = y_test[:y_pred.shape[0],:]
-    res = np.column_stack([y_true, y_pred, y_true-y_pred])
-    np.savetxt(os.path.join(export_path, "y_results.txt"), res, delimiter=',')
+    x_pred_e = (final_coeff_norm[:,:6].detach().cpu()*x_sigma_std + x_sigma_mean).numpy()
+    x_pred_s = (final_coeff_norm[:,6:12].detach().cpu()*x_seebeck_std + x_seebeck_mean).numpy()
+    x_pred_n = (final_coeff_norm[:,12:].detach().cpu()*x_n_std + x_n_mean).numpy()
+    x_pred = np.column_stack([x_pred_e, x_pred_s, x_pred_n])
+    np.savetxt(os.path.join(export_path, "x_pred.txt"), x_pred, delimiter=',')
+    x_true = np.column_stack([x_test_e[:x_pred.shape[0],:], x_test_s[:x_pred.shape[0],:], x_test_n[:x_pred.shape[0],:]]) 
+    res = np.column_stack([x_true, x_pred, x_true-x_pred])
+    np.savetxt(os.path.join(export_path, "x_results.txt"), res, delimiter=',')
 
     return np.mean(batch_loss)
 

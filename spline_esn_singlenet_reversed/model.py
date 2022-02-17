@@ -33,7 +33,7 @@ for p in params_trainable:
 
 gamma = (c.final_decay) ** (1. / c.n_epochs)
 optim = torch.optim.Adam(params_trainable, lr=c.lr_init, betas=c.adam_betas, eps=1e-6, weight_decay=c.l2_weight_reg)
-weight_scheduler = torch.optim.lr_scheduler.StepLR(optim, step_size=1, gamma=gamma)
+weight_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optim, mode='min', factor=0.1, patience=5, threshold=0.001, threshold_mode='rel', cooldown=0, min_lr=1e-06, eps=1e-08)
 
 
 def optim_step():

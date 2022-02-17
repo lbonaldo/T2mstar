@@ -7,7 +7,7 @@
 #SBATCH --gpus-per-node=v100:1
 ##SBATCH -o ~/Documents/inverse_problem/inverse/model/results/out1.out
 ##SBATCH -e ~/Documents/inverse_problem/inverse/model/results/err1.err
-#SBATCH -J inn
+#SBATCH -J train-inn
 
 source ~/.bashrc
 conda activate inverse
