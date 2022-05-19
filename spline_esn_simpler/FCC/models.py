@@ -75,7 +75,6 @@ class FCC3(BaseFCC):
         self.modelmix = FCCblock(3*self.dims_out,self.dims_out,0.1)
 
     def forward(self, e_x, n_x, s_x):
-        print(e_x.shape, n_x.shape, s_x.shape)
         return self.modelmix(torch.cat((self.enet(e_x), self.nnet(n_x), self.snet(s_x)), 1))
 
 
