@@ -24,19 +24,22 @@ def print_config():
 
 
 class Visualizer:
-    def __init__(self, loss_labels):
+    def __init__(self, loss_labels, lr_label):
             self.n_losses = len(loss_labels)
             self.loss_labels = loss_labels
+            self.lr_label = lr_label
             self.counter = 0
 
             self.header = 'Epoch '
+            for l in self.lr_label:
+                self.header += ' %15s' % (l)
             for l in loss_labels:
                 self.header += ' %15s' % (l)
             
             self.n_plots = 3
             self.figsize = (10,10)
 
-    def update_losses(self, losses, logscale=False):
+    def print_losses(self, lr, losses):
         if self.header:
             c.log(self.header, c.logfile)
             print(self.header)
@@ -44,6 +47,8 @@ class Visualizer:
 
         print('\r', '    '*20, end='')
         line = '\r%6.3i' % (self.counter)
+        for l in lr:
+            line += '  %14.4f' % (l)
         for l in losses:
             line += '  %14.4f' % (l)
 
@@ -84,6 +89,8 @@ def restart():
     global visualizer
     loss_labels = []
 
+    lr_label = 'lr'
+
     if c.train_max_likelihood:
         loss_labels.extend(['L_ML_e','L_ML_s','L_ML_n'])
     if c.train_forward_mmd:
@@ -95,11 +102,11 @@ def restart():
 
     loss_labels += [l + '(val)' for l in loss_labels]
 
-    visualizer = Visualizer(loss_labels)
+    visualizer = Visualizer(loss_labels, lr_label)
 
 
-def show_loss(losses, logscale=False):
-    visualizer.update_losses(losses, logscale)
+def show_loss(lr, losses):
+    visualizer.print_losses(lr, losses)
 
 def plot_loss(train_losses, eval_losses, logscale=False):
     visualizer.plot_losses(train_losses, eval_losses, logscale)

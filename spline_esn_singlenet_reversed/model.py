@@ -41,8 +41,8 @@ def optim_step():
     optim.zero_grad()
 
 
-def scheduler_step():
-    weight_scheduler.step()
+def scheduler_step(val_loss):
+    weight_scheduler.step(val_loss)
 
 
 def save(name):

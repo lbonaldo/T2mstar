@@ -38,18 +38,18 @@ def run_train():
             epoch_train_losses = train.train_epoch()
             epoch_val_losses  = train.train_epoch(eval=True)
 
-            val_loss_cum = epoch_val_losses[0]
-            if  val_loss_cum < running_loss:
+            val_loss = epoch_val_losses[0]
+            if  val_loss < running_loss:
                 print("Best loss: ", running_loss)
-                print("New loss: ", val_loss_cum)
+                print("New loss: ", val_loss)
                 model.save(c.filename_out)
-                running_loss = val_loss_cum
+                running_loss = val_loss
                 print("Model saved.")
 
             monitoring.show_loss(np.concatenate([epoch_train_losses, epoch_val_losses]))
             train_losses.append(epoch_train_losses)
             val_losses.append(epoch_val_losses)
-            model.scheduler_step()
+            model.scheduler_step(val_loss)
 
         monitoring.plot_loss(train_losses, val_losses, logscale=True)
         

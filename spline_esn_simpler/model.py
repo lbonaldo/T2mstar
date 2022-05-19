@@ -3,7 +3,7 @@ import FrEIA.framework
 import FrEIA.modules
 
 import config as c
-from subnets import FullyConnected
+from subnets import FullyConnected, subnet_conv
 
 
 nodes = [FrEIA.framework.InputNode(c.ndim_x + c.ndim_pad_x, name='input')]
@@ -34,20 +34,19 @@ params_e = list(filter(lambda p: p.requires_grad, model_e.parameters()))
 for p in params_e:
     p.data = c.init_scale * torch.randn(p.data.shape).to(c.device)    
 optim_e = torch.optim.Adam(params_e, lr=c.lr_init, betas=c.adam_betas, eps=1e-6, weight_decay=c.l2_weight_reg)
-scheduler_e = torch.optim.lr_scheduler.ReduceLROnPlateau(optim_e, mode='min', factor=0.1, patience=c.patience, threshold=0.001, threshold_mode='rel', cooldown=0, min_lr=1e-06, eps=1e-08)
-
+scheduler_e = torch.optim.lr_scheduler.ReduceLROnPlateau(optim_e, mode='min', factor=0.5, patience=c.patience, threshold=0.001, threshold_mode='rel', cooldown=0, min_lr=1e-06, eps=1e-08)
 
 params_s = list(filter(lambda p: p.requires_grad, model_s.parameters()))
 for p in params_s:
     p.data = c.init_scale * torch.randn(p.data.shape).to(c.device)
 optim_s = torch.optim.Adam(params_s, lr=c.lr_init, betas=c.adam_betas, eps=1e-6, weight_decay=c.l2_weight_reg)
-scheduler_s = torch.optim.lr_scheduler.ReduceLROnPlateau(optim_s, mode='min', factor=0.1, patience=c.patience, threshold=0.001, threshold_mode='rel', cooldown=0, min_lr=1e-06, eps=1e-08)
+scheduler_s = torch.optim.lr_scheduler.ReduceLROnPlateau(optim_s, mode='min', factor=0.5, patience=c.patience, threshold=0.001, threshold_mode='rel', cooldown=0, min_lr=1e-06, eps=1e-08)
 
 params_n = list(filter(lambda p: p.requires_grad, model_n.parameters()))
 for p in params_n:
     p.data = c.init_scale * torch.randn(p.data.shape).to(c.device)
 optim_n = torch.optim.Adam(params_n, lr=c.lr_init, betas=c.adam_betas, eps=1e-6, weight_decay=c.l2_weight_reg)
-scheduler_n = torch.optim.lr_scheduler.ReduceLROnPlateau(optim_n, mode='min', factor=0.1, patience=c.patience, threshold=0.001, threshold_mode='rel', cooldown=0, min_lr=1e-06, eps=1e-08)
+scheduler_n = torch.optim.lr_scheduler.ReduceLROnPlateau(optim_n, mode='min', factor=0.5, patience=c.patience, threshold=0.001, threshold_mode='rel', cooldown=0, min_lr=1e-06, eps=1e-08)
 
 models = (model_e,model_s,model_n)
 params_trainables = (params_e,params_s,params_n) 

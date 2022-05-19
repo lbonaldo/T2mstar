@@ -25,7 +25,7 @@ def inference(model_path):
         os.mkdir(export_path)
 
     # MODEL INITIALIZATION
-    model.model.eval()
+    model.model.train()
 
     #model.load("/mnt/scratch/bonal1lCMICH/inverse/spline/results/Jan-14-2022/06-51-44/inn.pt")
     model.load(os.path.join(model_path, 'inn.pt'))
@@ -91,8 +91,10 @@ def inference(model_path):
     x_pred = np.column_stack([x_pred_e, x_pred_s, x_pred_n])
     np.savetxt(os.path.join(export_path, "x_pred.txt"), x_pred, delimiter=',')
     x_true = np.column_stack([x_test_e[:x_pred.shape[0],:], x_test_s[:x_pred.shape[0],:], x_test_n[:x_pred.shape[0],:]]) 
-    res = np.column_stack([x_true, x_pred, x_true-x_pred])
-    np.savetxt(os.path.join(export_path, "x_results.txt"), res, delimiter=',')
+    comb = np.column_stack([x_true, x_pred])
+    np.savetxt(os.path.join(export_path, "x_comb.txt"), comb, delimiter=',')
+    err = np.abs(x_true-x_pred)
+    np.savetxt(os.path.join(export_path, "x_rel_err.txt"), err, delimiter=',')
 
     return np.mean(batch_loss)
 

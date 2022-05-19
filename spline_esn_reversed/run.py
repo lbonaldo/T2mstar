@@ -16,6 +16,11 @@ import train
 import test
 
 
+def get_lr(optimizer):
+    for param_group in optimizer.param_groups:
+        return param_group['lr']
+
+
 def run_train():
     torch.multiprocessing.freeze_support()
 
@@ -43,17 +48,18 @@ def run_train():
             epoch_val_losses  = train.train_epoch(eval=True)
 
             val_loss_cum = (epoch_val_losses[0]+epoch_val_losses[1]+epoch_val_losses[2])/3
-            if  val_loss_cum< running_loss:
+            if  val_loss_cum < running_loss:
                 print("Best loss: ", running_loss)
                 print("New loss: ", val_loss_cum)
                 model.save(c.filename_out)
                 running_loss = val_loss_cum
                 print("Model saved.")
 
-            monitoring.show_loss(np.concatenate([epoch_train_losses, epoch_val_losses]))
+            lrs = (get_lr(model.optim_e), get_lr(model.optim_s), get_lr(model.optim_n))
+            monitoring.show_loss(lrs, np.concatenate([epoch_train_losses, epoch_val_losses]))
             train_losses.append(epoch_train_losses)
             val_losses.append(epoch_val_losses)
-            model.scheduler_step()
+            model.scheduler_step(val_loss_cum)
 
         monitoring.plot_loss(train_losses, val_losses, logscale=True)
         

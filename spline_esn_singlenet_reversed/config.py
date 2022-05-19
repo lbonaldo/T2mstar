@@ -124,11 +124,11 @@ mmd_back_weighted = True
 # Initialize the model parameters from a normal distribution with this sigma
 init_scale = 0.20
 #
-N_blocks   = 4
+N_blocks   = 6
 #
 exponent_clamping = 2.0
 #
-hidden_layer_sizes = 128
+hidden_layer_sizes = 64
 #
 dropout_perc = 0.2
 #
