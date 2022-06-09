@@ -36,9 +36,9 @@ function forwardProb(β)
         println("Bands cross!")
     end
     α = sqrt(β/π)
-    xarr = -5:0.05:5
-    lines!(axtopright, xarr, r.(xarr,c,d), label=L"R(x;c,d)", color=ColorSchemes.tab10[3], lw=2, xlabel="t", ylabel="L, R, G")
-    lines!(axtopright, xarr, l.(xarr,a,b), label=L"L(x;a,b)", color=ColorSchemes.tab10[1], lw=2)
+    xarr = -4:0.05:6
+    lines!(axtopright, xarr, l.(xarr,a,b), label=L"L(x)=\sqrt{-ax-b}", color=ColorSchemes.tab10[1], lw=2)
+    lines!(axtopright, xarr, r.(xarr,c,d), label=L"R(x)=\sqrt{cx-d}", color=ColorSchemes.tab10[3], lw=2, xlabel="t", ylabel="L, R, G")
     gaussian(x) = α*exp(-β*(x - μ)^2)
     l_min(x) = l(x,a,b) - gaussian(x)
     r_min(x) = r(x,c,d) - gaussian(x)
@@ -81,7 +81,7 @@ noto_sans = assetpath("fonts", "NotoSans-Regular.ttf")
 noto_sans_bold = assetpath("fonts", "NotoSans-Bold.ttf")
 
 fig = Figure(backgroundcolor = RGBf(0.98, 0.98, 0.98),
-resolution = (1000, 1000), font = noto_sans)
+resolution = (1100, 1000), font = noto_sans)
 
 axtop = Axis(fig[1,1])
 axmain = Axis(fig[2,1], xlabel = "prediction", ylabel = "true")
@@ -94,7 +94,7 @@ linkxaxes!(axmain, axtop)
 for (i,coeff) in enumerate(coeff_name)
     color = ColorSchemes.tab10[i]
     println(color)
-    scatter!(axmain, res[:, coeff*"_pred"], res[:, coeff*"_true"], markersize = 5, color = (color, 0.2), label = coeff)
+    scatter!(axmain, res[:, coeff*"_pred"], res[:, coeff*"_true"], markersize = 1, color = (color, 0.2), label = coeff)
     density!(axtop, res[:, coeff*"_pred"], color = (color, 0.2), strokecolor = color, strokewidth = 1, strokearound = true)
     density!(axright, res[:, coeff*"_true"], direction = :y, color = (color, 0.2), strokecolor = color, strokewidth = 1, strokearound = true)
 end
@@ -103,12 +103,13 @@ X = 2.0
 Y = forwardProb(X)
 
 #axislegend(axmain)
+hidedecorations!(axtopright)
+hidedecorations!(axtop, grid = false)
 hidexdecorations!(axtop, grid = false)
-hideydecorations!(axright, grid = false)
 colgap!(fig.layout, 10)
 rowgap!(fig.layout, 10)
 Legend(fig[1:2, 3], axmain, markersize = 5)
-Label(fig[0,:], text = "NN results: reconstruction of coefficients' distributions", fontsize = 30)
+Label(fig[0,1:2], text = "INN prediction: reconstruction of coefficients' distributions from I", textsize = 25)
 save(joinpath(test_name, "leg.png"), fig)
 
 
