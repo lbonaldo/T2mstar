@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 name = "inverse"
 uuid = "ffe863b0-673d-4f8d-9b83-b43ef9ac35c9"
 authors = ["lbonaldo <bonaldo.luca12@gmail.com>"]
@@ -20,3 +21,9 @@ PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
 QuadGK = "1fd47b50-473d-5c70-9696-f719f8f3bcdc"
 Roots = "f2b01f46-fcfa-551c-844a-d8ac1e96c665"
 WebIO = "0f1e0344-ec1d-5b48-a673-e5cf874b6c29"
+=======
+name = "T2mstar"
+uuid = "4b6a1bec-1198-4707-8171-848c186b52db"
+authors = ["lbonaldo <bonaldo.luca12@gmail.com>"]
+version = "0.1.0"
+>>>>>>> 3365e8f ([init] first commit.)
