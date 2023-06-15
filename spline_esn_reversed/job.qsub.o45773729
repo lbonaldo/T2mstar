@@ -1,70 +1,0 @@
-================================================================================
-Config options:
-
-  N_blocks                 	4
-  adam_betas               	(0.9, 0.95)
-  add_pad_noise            	0.0001
-  add_y_noise              	0.01
-  add_z_noise              	0.01
-  batch_norm               	False
-  batch_size               	100
-  data_path                	/mnt/scratch/bonal1lCMICH/inverse/spline_esn_reversed/data
-  device                   	cuda
-  dropout_perc             	0.2
-  exponent_clamping        	2.0
-  filename_in              	
-  filename_out             	/mnt/scratch/bonal1lCMICH/inverse/spline_esn_reversed/results/Feb-17-2022/11-01-59/inn.pt
-  final_decay              	0.01
-  hidden_layer_sizes       	64
-  init_scale               	0.2
-  interactive_visualization	False
-  l2_weight_reg            	0.05
-  lambd_fit_forw           	0.001
-  lambd_max_likelihood     	0.001
-  lambd_mmd_back           	10.0
-  lambd_mmd_forw           	1.0
-  lambd_reconstruct        	1.0
-  logfile                  	/mnt/scratch/bonal1lCMICH/inverse/spline_esn_reversed/results/Feb-17-2022/11-01-59/out.txt
-  lr_init                  	0.001
-  mmd_back_kernels         	[(1, 0.1), (1, 0.5), (1, 2)]
-  mmd_back_weighted        	True
-  mmd_forw_kernels         	[(1, 2), (1, 2), (1, 2)]
-  n_epochs                 	60
-  n_its_per_epoch          	5000
-  ndim_pad_x               	0
-  ndim_pad_zy              	0
-  ndim_x                   	9
-  ndim_y                   	6
-  ndim_z                   	3
-  pre_low_lr               	5
-  test_path                	/mnt/scratch/bonal1lCMICH/inverse/spline_esn_reversed/results/Feb-17-2022/11-01-59
-  test_time_functions      	[]
-  train_backward_mmd       	True
-  train_forward_mmd        	True
-  train_max_likelihood     	True
-  train_reconstruction     	True
-  use_cuda                 	True
-  use_permutation          	False
-  verbose_construction     	False
-  y_uncertainty_sigma      	0.1
-  zeros_noise_scale        	100
-================================================================================
-
-Best loss:  inf
-New loss:  0.5761225176348351
-Model saved.
-Epoch           L_ML_e          L_ML_s          L_ML_n         L_fit_e         L_fit_s         L_fit_n     L_mmd_fwd_e     L_mmd_fwd_s     L_mmd_fwd_n    L_mmd_back_e    L_mmd_back_s    L_mmd_back_n       L_reconst     L_ML_e(val)     L_ML_s(val)     L_ML_n(val)    L_fit_e(val)    L_fit_s(val)    L_fit_n(val) L_mmd_fwd_e(val) L_mmd_fwd_s(val) L_mmd_fwd_n(val) L_mmd_back_e(val) L_mmd_back_s(val) L_mmd_back_n(val)  L_reconst(val)
-                                                                                    000       1318.2577       1399.9806       1347.0529          4.3771          0.1561          4.6495          0.2461          4.4728          0.1858          0.5497          0.5497          0.5497  6909073154986.5410          0.5857          0.5753          0.5674          0.0019          0.1305          0.0019          0.2118          0.0019          0.1547          0.5458          0.5458          0.5458          0.0000
-                                                                                    001          0.5854          0.5778          0.5707          0.0019          0.1304          0.0019          0.2116          0.0019          0.1542          0.5456          0.5456          0.5456          0.0000          0.5857          0.5753          0.5674          0.0019          0.1299          0.0019          0.2131          0.0019          0.1551          0.5457          0.5457          0.5457          0.0000
-Best loss:  0.5761225176348351
-New loss:  0.5761130166874928
-Model saved.
-                                                                                    002          0.5854          0.5778          0.5707          0.0019          0.1304          0.0019          0.2115          0.0019          0.1545          0.5457          0.5457          0.5457          0.0000          0.5857          0.5753          0.5673          0.0019          0.1307          0.0019          0.2114          0.0019          0.1550          0.5457          0.5457          0.5457          0.0000
-                                                                                    003          0.5854          0.5779          0.5707          0.0019          0.1306          0.0019          0.2118          0.0019          0.1546          0.5457          0.5457          0.5457          0.0000          0.5856          0.5754          0.5674          0.0019          0.1304          0.0019          0.2129          0.0019          0.1551          0.5458          0.5458          0.5458          0.0000
-Best loss:  0.5761130166874928
-New loss:  0.5761053813466551
-Model saved.
-                                                                                    004          0.5854          0.5778          0.5707          0.0019          0.1304          0.0019          0.2111          0.0019          0.1543          0.5457          0.5457          0.5457          0.0000          0.5857          0.5753          0.5673          0.0019          0.1304          0.0019          0.2114          0.0019          0.1545          0.5458          0.5458          0.5458          0.0000
-                                                                                    005          0.5854          0.5778          0.5707          0.0019          0.1305          0.0019          0.2113          0.0019          0.1545          0.5456          0.5456          0.5456          0.0000          0.5857          0.5754          0.5674          0.0019          0.1301          0.0019          0.2120          0.0019          0.1533          0.5457          0.5457          0.5457          0.0000
-                                                                                    006          0.5854          0.5778          0.5707          0.0019          0.1305          0.0019          0.2112          0.0019          0.1547          0.5456          0.5456          0.5456          0.0000          0.5857          0.5753          0.5674          0.0019          0.1308          0.0019          0.2113          0.0019          0.1545          0.5458          0.5458          0.5458          0.0000
-                                                                                    007          0.5854          0.5778          0.5707          0.0019          0.1304          0.0019          0.2115          0.0019          0.1546          0.5457          0.5457          0.5457          0.0000          0.5856          0.5753          0.5674          0.0019          0.1302          0.0019          0.2118          0.0019          0.1553          0.5458          0.5458          0.5458          0.0000
