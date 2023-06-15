@@ -116,5 +116,5 @@ if __name__ == '__main__':
 
     if len(sys. argv) < 2:
         exit("Experiment path missing") 
-    Tester(FCC3,sys.argv[1]).exec()
+    Tester(FCC1,sys.argv[1]).exec()
 

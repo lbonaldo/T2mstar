@@ -54,7 +54,7 @@ device          = torch.device("cuda" if use_cuda else "cpu")
 #  Data dimensions  #
 #####################
 
-ndim_x     = [8,8,8] # esn with a polyfit of degree 5
+ndim_x     = 24 # esn with a polyfit of degree 5
 ndim_y     = 7  # seven parameters for band structure
 
 #######################
@@ -64,35 +64,35 @@ ndim_y     = 7  # seven parameters for band structure
 # Initialize the model parameters from a normal distribution with this sigma
 init_scale      = 0.20
 # Initial learning rate
-lr_init         = 0.1
+lr_init         = 0.001
 #Batch size
 batch_size      = 500
 # Total number of epochs to train for
-n_epochs        = 500
+n_epochs        = 1500
 # End the epoch after this many iterations (or when the train loader is exhausted)
 n_its_per_epoch = 5000
 # wait this # of epochs before decresing lr
-patience        = 50
+patience        = 100
 # after patience, lr *= sch_factor
-sch_factor      = 0.1
+sch_factor      = 0.2
 # L2 weight regularization of model parameters
-l2_weight_reg   = 1e-15
+l2_weight_reg   = 1e-2
 # Parameters beta1, beta2 of the Adam optimizer
 adam_betas      = (0.9, 0.99)
 # dimension of each layer
-# dim_layers  = [64,14]
-# NNet = FCC1
-# dim_layers1 = [32,64,128,64,32]
-# dim_layers2 = [16,32,64,32,16]
+dim_layers  = [32,64,128,256,256,128,64,32,32]
+NNet = FCC1
+# dim_layers1 = [10,32,64,64,128,128,64,32,32]
+# dim_layers2 = [10,16,32,64,64,32,16,16,10]
 # dim_layers  = [dim_layers1,dim_layers2]
 # NNet = FCC2
-dim_layers1 = [16,32,32,16]
-dim_layers2 = [16,32,32,16]
-dim_layers3 = [16,32,32,16]
-dim_layers  = [dim_layers1,dim_layers2,dim_layers3]
-NNet = FCC3
+# dim_layers1 = [10,16,32,64,64,32,16,16,10]
+# dim_layers2 = [10,16,32,64,64,32,16,16,10]
+# dim_layers3 = [10,16,32,64,64,32,16,16,10]
+# dim_layers  = [dim_layers1,dim_layers2,dim_layers3]
+# NNet = FCC3
 # dropout_perc for each layer
-dropout_perc    = [.0,.0,.0,.0]
+dropout_perc    = [.0,.1,.1,.1,.1,.1,.1,.0,.0]
 # loss
 Loss = "MSE"
 #Loss = "cstMSE"

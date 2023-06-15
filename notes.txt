@@ -5,6 +5,7 @@ Pipeline on the cluster
 TRAINING
 - edit config.py with appropriate parameters
 - qsub job.qsub
+
 TEST
 - create a folder for new test
 - cp inn.pt from scratch inside that folder
@@ -14,7 +15,6 @@ copy the results in the same test folder locally to create plots with julia
 - scp bonal1lCMICH@hpcc.msu.edu:/mnt/home/bonal1lCMICH/Documents/inverse_problem/inverse/model/test/results/test_11/data/*.csv data/ 
 - if necessary change number of pots "idxs" in the plot_test.jl file
 - julia --project=. model/test/plot_test.jl test_11 
-
 
 New version
 TRAINING

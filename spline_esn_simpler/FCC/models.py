@@ -25,8 +25,8 @@ class FCCblock(nn.Module):
             nn.Linear(dim_in, dim_out),
             nn.BatchNorm1d(dim_out),
             nn.Dropout(p=self.dropout),
-            #nn.LeakyReLU(inplace=True),
-            nn.Sigmoid()
+            nn.LeakyReLU(),
+            #nn.Sigmoid()
         )
 
     def forward(self, x):
@@ -72,10 +72,11 @@ class FCC3(BaseFCC):
         self.nnet = TensorSubnet(self.dims_in[1],self.dims_out,self.dim_layers[1],self.dropout_perc)
         self.snet = TensorSubnet(self.dims_in[2],self.dims_out,self.dim_layers[2],self.dropout_perc)
 
-        self.modelmix = FCCblock(3*self.dims_out,self.dims_out,0.1)
+        self.modelmix = FCCblock(3*self.dims_out,self.dims_out,0.0)
 
     def forward(self, e_x, n_x, s_x):
         return self.modelmix(torch.cat((self.enet(e_x), self.nnet(n_x), self.snet(s_x)), 1))
+        # return torch.div(torch.add(torch.add(self.enet(e_x), self.nnet(n_x)), self.snet(s_x)),3)
 
 
 class FCC2(BaseFCC):
