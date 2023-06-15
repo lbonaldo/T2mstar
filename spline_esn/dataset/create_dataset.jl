@@ -91,6 +91,7 @@ function test_data(filenames::Array{String}, f_index::Array{Int64}, indices::Arr
     end
 end
 
+# filenames: array of fullpath of results.csv files, rows: number of models
 function create_dataset(filenames::Array{String}, rows::Int64, polydegree::Int64, tn::Int64)
     n_coeff = polydegree+1
     n_files = length(filenames)

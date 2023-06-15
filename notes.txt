@@ -25,3 +25,6 @@ TEST
 VISUALIZATION
 - julia visualization.jl /mnt/scratch/bonal1lCMICH/inverse/spline/results/Jan-26-2022/16-15-17/test/
 
+
+TODO:
+- export directly into python arrays.
