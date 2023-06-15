@@ -14,10 +14,10 @@ jlgreen = Colors.JULIA_LOGO_COLORS.green
 function plot_χ(n_iter::Int64,χ_vec::Array{Float64},χ_acpt::Vector{Vector{Float64}})
     fig = Figure(backgroundcolor = RGBf(0.98, 0.98, 0.98), resolution = (650*2, 500));
     ax1 = Axis(fig[1,1], xlabel="iter", ylabel="χsq", xlabelsize=xlabelsize, ylabelsize=ylabelsize);
-    Label(fig[1,1,Top()], "χ random evolution", padding = (0, 0, 25, 10), textsize=titlesize);
+    Label(fig[1,1,Top()], "χ random evolution", padding = (0, 0, 25, 10), fontsize=titlesize);
     scatter!(ax1, collect(1:n_iter), χ_vec, markersize=2.5);
     ax2 = Axis(fig[1,2], xlabel="steps", ylabel="χsq", xlabelsize=xlabelsize, ylabelsize=ylabelsize);
-    Label(fig[1,2,Top()], "χ-accepted evolution", padding = (0, 0, 25, 10), textsize=titlesize);
+    Label(fig[1,2,Top()], "χ-accepted evolution", padding = (0, 0, 25, 10), fontsize=titlesize);
     scatter!(ax2, [el[1] for el in χ_acpt], [el[2] for el in χ_acpt], markersize=5);
     return fig
 end
@@ -94,7 +94,7 @@ function plot_best(num_bands::Int64,bandtype::Vector{Int64},τ_form::ScModel,T::
     # plot true vs best_pred
     for i in 1:num_tensors
         ax = Axis(fig[1,i], xlabel=xlabels[i], ylabel=ylabels[i], xlabelsize=xlabelsize, ylabelsize=ylabelsize)
-        Label(fig[1,i,Top()], titles[i], padding = (0, 0, 25, 10), textsize=titlesize)
+        Label(fig[1,i,Top()], titles[i], padding = (0, 0, 25, 10), fontsize=titlesize)
         if tensor_names[i] == "seebeck"
             lines!(ax, T, vec(true_tensors[i])*1e6, label="True")
             lines!(ax, T, vec(pred_tensors[i])*1e6, label="Pred")
@@ -121,7 +121,7 @@ function plot_evoacept(num_bands::Int64,bandtype::Vector{Int64},τ_form::ScModel
     axes = Vector{Axis}(undef,num_tensors)
     for i in 1:num_tensors
         ax = Axis(fig[1,i], xlabel=xlabels[i], ylabel=ylabels[i], xlabelsize=xlabelsize, ylabelsize=ylabelsize)
-        Label(fig[1,i,Top()], titles[i], padding = (0, 0, 25, 10), textsize=titlesize)
+        Label(fig[1,i,Top()], titles[i], padding = (0, 0, 25, 10), fontsize=titlesize)
         axes[i] = ax
     end
     # pred
@@ -153,7 +153,7 @@ function plot_evoacept(num_bands::Int64,bandtype::Vector{Int64},τ_form::ScModel
 end
 
 
-function plot_bandstructure!(axes::Array{Axis},bs::BandStructure,xaxis::AbstractArray,color::ColorTypes.RGBA{Float64},label::String)
+function plot_bandstructure!(axes::Array{Axis},bs::BandStructure,xaxis::AbstractArray,color,label::String)
 
     n_bands = bs.n
     bands = bs.bands

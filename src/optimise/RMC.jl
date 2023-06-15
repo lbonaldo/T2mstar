@@ -16,16 +16,20 @@ end
     K::Vector{Float64} = Float64[]              # thermal conductivity
 end
 # outer ctor
-function GroundTruth(τ::ScModel,T::Union{Vector{Float64},Vector{Int64}},σ::Union{Vector{Float64},Matrix{Float64}},S::Union{Vector{Float64},Matrix{Float64}},n::Union{Vector{Float64},Matrix{Float64}},K::Union{Vector{Float64},Matrix{Float64}})
+function GroundTruth(τ::ScModel,T::Union{Vector{Float64},Vector{Int64}},σ::Union{Vector{Float64},Matrix{Float64}},S::Union{Vector{Float64},Matrix{Float64}},n::Union{Vector{Float64},Matrix{Float64}})
     σ = !isempty(σ) ? vec(σ) : Float64[]
     S = !isempty(S) ? vec(S) : Float64[]
     n = !isempty(n) ? vec(n) : Float64[]
-    K = !isempty(K) ? vec(K) : Float64[]
-    return GroundTruth(τ,T,σ,S,n,K)
+    return GroundTruth(τ,T,σ,S,n,Float64[])
+end
+
+struct Model
+    bs::BandStructure
+    τ::ScModel
 end
 
 
-function get_randcand(n_bands::Int64,rng::MersenneTwister,mrange::AbstractVector,erange::AbstractVector,μrange::AbstractVector,bandtype::Array{Int64})
+function get_randcand(n_bands::Int64,rng::MersenneTwister,mrange::AbstractVector,erange::AbstractVector,μrange::AbstractVector,τrange::AbstractVector,bandtype::Array{Int64})
     # new model candidate from random params 
     bands_cand = Array{ParabBand}(undef,n_bands)
     for b in 1:n_bands
@@ -42,32 +46,47 @@ function get_randcand(n_bands::Int64,rng::MersenneTwister,mrange::AbstractVector
         # create the band 
         bands_cand[b] = ParabBand(m,e0,type,1);
     end
+    # chemical potential
     μ_cand = rand(rng,μrange);
-    return BandStructure(n_bands,bands_cand,μ_cand);   # build the band structure
+    bs = BandStructure(n_bands,bands_cand,μ_cand);   # build the band structure
+    # relaxation time
+    τ_A_cand,τ_B_cand,τ_C_cand = rand(rng,τrange[1]),rand(rng,τrange[2]),rand(rng,τrange[3])
+    τ(t) = τ_A_cand*(1/(t-τ_B_cand)^τ_C_cand)
+    τ_form = Scattering.T_fun(τ)
+    # return the model candidate
+    return Model(bs,τ_form)
 end
 
 
-function updatecand(model::BandStructure,n_bands::Int64,rng::MersenneTwister,mrange::AbstractVector,erange::AbstractVector,μrange::AbstractVector)
+function select_params2change()
     # create a vector of parameters to change
-    params = Vector(undef,2n_bands+1)    # 2b+1: masses,en for each band + μ
+    params = Vector(undef,2n_bands+1)   # 2b+1: masses,en for each band + μ
     for b in 1:n_bands
-        m_start = (b-1)*3+1   # 3 masses
+        m_start = (b-1)*3+1             # 3 masses
         params[b] = mrange[m_start:m_start+2]
     end
     for b in 1:n_bands
-        params[b+n_bands] = erange[b]
+        params[b+n_bands] = erange[b]   # energy
     end
+    
 
     # randomly select which parameter to change
     idx = rand(1:length(params))
+
+end
+
+
+function updatecand(model::Model,n_bands::Int64,rng::MersenneTwister,mrange::AbstractVector,erange::AbstractVector,μrange::AbstractVector)
+
+
 
     bands = Array{ParabBand}(undef,n_bands)
     # effective masses
     if (idx <= n_bands)    # change the masses
         for b in 1:n_bands
             local m
-            tmp_band = model.bands[b]
-
+            tmp_band = bs.bands[b]
+    
             if b == idx
                 ranges = params[idx]
                 m = [Float64(rand(rng,ranges[1])),
@@ -80,17 +99,17 @@ function updatecand(model::BandStructure,n_bands::Int64,rng::MersenneTwister,mra
                      tmp_band.mstar[3],
                      0.0,0.0,0.0];
             end
-            e0 = tmp_band.e0
+            e0 = tmp_band.ϵ₀
             type = tmp_band.type
             bands[b] = ParabBand(m,e0,type,1);
         end
-        return BandStructure(n_bands,bands,model.μ)
-
-    # energy (~position)
+        return BandStructure(n_bands,bands,bs.μ)
+    
+    # energy (position)
     elseif (idx > n_bands) && (idx <= 2n_bands) # change band min/max
         for b in 1:n_bands
             local e0
-            tmp_band = model.bands[b]
+            tmp_band = bs.bands[b]
 
             m = tmp_band.mstar;
 
@@ -99,17 +118,17 @@ function updatecand(model::BandStructure,n_bands::Int64,rng::MersenneTwister,mra
             if b == band_idx
                 e0 = rand(rng,range)
             else
-                e0 = tmp_band.e0
+                e0 = tmp_band.ϵ₀
             end
             type = tmp_band.type
             bands[b] = ParabBand(m,e0,type,1);
         end
-        return BandStructure(n_bands,bands,model.μ)
+        return BandStructure(n_bands,bands,bs.μ)
  
     # fermi level position
     elseif idx == 2n_bands+1
         μ = rand(rng,μrange);
-        return BandStructure(n_bands,model.bands,μ)
+        return BandStructure(n_bands,bs.bands,μ)
     end
 end
 
@@ -133,7 +152,7 @@ function update_singleparam(model::BandStructure,n_bands::Int64,rng::MersenneTwi
                     m[m_i] = band.mstar[m_i]  # same mass
                 end
             end
-            e0 = band.e0
+            e0 = band.ϵ₀
             type = band.type
             bands[b] = ParabBand(m,e0,type,1);
         end
@@ -151,7 +170,7 @@ function update_singleparam(model::BandStructure,n_bands::Int64,rng::MersenneTwi
             if b == band_idx
                 e0 = rand(rng,erange[b])   # new energy candidate
             else
-                e0 = band.e0    # same energy
+                e0 = band.ϵ₀    # same energy
             end
             type = band.type
             bands[b] = ParabBand(m,e0,type,1);
@@ -194,24 +213,27 @@ end
 function RMC(model_true::BandStructure,grtrue::GroundTruth,args::Args,ranges::Dict{String,AbstractVector};anneal=false,plot::Bool=false)
 
     # set some general parameters
-    n_bands = model_true.n
-    n_params = 4n_bands+1   # each band has 4 params (3m*+e0) + μ
+    n_bands = model_true.n  # number of bands
+    n_params = 4n_bands+1   # 4 params for each band (3m*+ϵ₀) + chemical potential
     bandtype = [band.type for band in model_true.bands] # get the type of bands from true model
-    T = grtrue.T    # temperature
+    T = grtrue.T        # temperature
     τ_form = grtrue.τ   # relaxation time
     
     # candidate models - get parameters constraints
     mrange = ranges["m"]
-    erange = checkerange!(ranges["e0"])
+    erange = checkerange!(ranges["ϵ₀"])
     μrange = ranges["μ"]
+    τrange = ranges["τ"]
     
-    tot_comb = prod([length(v) for v in mrange]) * prod([length(v) for v in erange]) * length(μrange);
+    # number of total possible combinations
+    tot_comb = prod([length(v) for v in mrange]) * prod([length(v) for v in erange]) * length(μrange) * prod([length(v) for v in τrange]);
     println("Total possible combinations: ", tot_comb)
     
+    # create folder to export results
     outpath = create_runfolder(".")
     println("---> 1. Output folder created.")
     
-    # RMC parameters
+    # set RMC parameters
     n_iter = args.n_iter
     n_restart = args.n_restart
     err = args.err
@@ -219,14 +241,11 @@ function RMC(model_true::BandStructure,grtrue::GroundTruth,args::Args,ranges::Di
     β_step = args.β_step
     idx2plot = unique(rand(1:n_restart,4))  # export only 4 chains
     
-    # simulated annealing - geometric
-    # f(b::Float64,α::Float64) = b / α
-    # f(b) = f(b,0.1)
     # simulated annealing - exp decay
-    f(x::Real,n::Int64,α::Float64) = exp(60(x+α)/(n+α))
-    f(x) = f(x,n_iter,-1.6)
+    exp_annealing(x::Real,n::Int64,α::Float64) = exp(60(x+α)/(n+α))
+    exp_annealing(x) = exp_annealing(x,n_iter,-1.6)
 
-    # get non-zero true transport coefficients
+    # get (non-zero) true/experimental transport coefficients
     not_empty_tensors = [!isempty(grtrue.σ),!isempty(grtrue.S),!isempty(grtrue.n),!isempty(grtrue.K)]
     n_tensors = sum(not_empty_tensors)
     true_tensors = [grtrue.σ,grtrue.S,grtrue.n,grtrue.K][not_empty_tensors]
@@ -246,11 +265,10 @@ function RMC(model_true::BandStructure,grtrue::GroundTruth,args::Args,ranges::Di
     model_best = SharedArray{Float64}(n_params,n_restart)
 
     # run all the algorithm
-    println("---> 2. RMC started.")
+    println("\n---> 2. RMC started.")
     t_start = time_ns()
     @sync Threads.@threads for run_idx in 1:n_restart
 
-        
         # get local random seed
         rng = MersenneTwister()
         
@@ -260,18 +278,14 @@ function RMC(model_true::BandStructure,grtrue::GroundTruth,args::Args,ranges::Di
         models_acpt = Vector{Float64}[];
         
         χsq_running = Inf;  # best χ square during the loop
-        β = args.β_init # reset β
+        β = args.β_init     # reset β
         i_acpt = 1;         # index on accepted models
 
-        model_running = get_randcand(n_bands,rng,mrange,erange,μrange,bandtype)
+        model_running = get_randcand(n_bands,rng,mrange,erange,μrange,τrange,bandtype)
         for iter in 1:n_iter
 
-            # # annealing step - geometric
-            # if anneal && mod(iter,β_step) == 0
-            #     β = f(β)
-            # end
             # annealing step - exp decay
-            β = f(iter)
+            β = exp_annealing(iter)
 
             model_cand = updatecand(model_running,n_bands,rng,mrange,erange,μrange)
 
@@ -293,7 +307,7 @@ function RMC(model_true::BandStructure,grtrue::GroundTruth,args::Args,ranges::Di
                 for b in 1:n_bands
                     band = model_cand.bands[b]
                     idx = (b-1)*4     # index to select the correct position in the model_cand_params array
-                    model_cand_params[idx+1:idx+4] = cat(band.mstar[1:3],band.e0,dims=1)
+                    model_cand_params[idx+1:idx+4] = cat(band.mstar[1:3],band.ϵ₀,dims=1)
                 end
                 push!(models_acpt,cat(model_cand_params,model_cand.μ, dims=1))    # add new accepted model
             else
@@ -314,7 +328,7 @@ function RMC(model_true::BandStructure,grtrue::GroundTruth,args::Args,ranges::Di
                     for b in 1:n_bands
                         band = model_cand.bands[b]
                         idx = (b-1)*4     # index to select the correct position in the model_cand_params array
-                        model_cand_params[idx+1:idx+4] = cat(band.mstar[1:3],band.e0,dims=1)
+                        model_cand_params[idx+1:idx+4] = cat(band.mstar[1:3],band.ϵ₀,dims=1)
                     end
                     push!(models_acpt,cat(model_cand_params,model_cand.μ, dims=1))    # add new accepted model
                 else
@@ -352,8 +366,8 @@ function RMC(model_true::BandStructure,grtrue::GroundTruth,args::Args,ranges::Di
     for b in 1:n_bands
         band = model_true.bands[b]
         idx = (b-1)*4     # index to select the correct position in the model_cand_params array
-        model_true_params[idx+1:idx+4] = cat(band.mstar[1:3],band.e0,dims=1)
-        energies[b] = band.e0
+        model_true_params[idx+1:idx+4] = cat(band.mstar[1:3],band.ϵ₀,dims=1)
+        energies[b] = band.ϵ₀
     end
     energies[end] = model_true.μ
     model_best = shiftenergies!(model_best,energies,n_bands)

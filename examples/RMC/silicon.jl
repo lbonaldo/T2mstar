@@ -28,10 +28,14 @@ mrange = 1:4;
 ϵ₀c_range = .0:.1:0.8;
 ϵ₀v_range = 0.0;
 μrange = -.5:0.1:.5;
+τ_A_range = (40:1:50)*1e-11
+τ_B_range = 0:50:100
+τ_C_range = 2:0.1:3
 
 ranges = Dict("m"  => [mrange,mrange,mrange,mrange,mrange,mrange], 
               "ϵ₀" => [ϵ₀c_range,ϵ₀v_range],
-              "μ"  => μrange   );
+              "μ"  => μrange,
+              "τ"  => [τ_A_range,τ_B_range,τ_C_range] );
 
 # run the algorithm
-χ_best,model_best = T2mstar.RMC(model_true,coeff_true,args,ranges,anneal=true,plot=false);
+χ_best,model_best = Mstar2t.RMC(model_true,coeff_true,args,ranges,anneal=true,plot=false);
